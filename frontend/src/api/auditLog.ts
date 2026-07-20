@@ -1,0 +1,5 @@
+import client from './client';
+import { AuditLogEntry, PaginatedResponse } from '../types';
+
+export const getAuditLog = (params: { orderId?: string; page?: number; limit?: number; search?: string }) =>
+  client.get<PaginatedResponse<AuditLogEntry>>('/audit-log', { params }).then((r) => r.data);
