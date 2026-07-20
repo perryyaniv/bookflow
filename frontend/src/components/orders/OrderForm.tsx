@@ -136,31 +136,39 @@ export default function OrderForm({ initial, onSubmit, onCancel, loading, isEdit
         <div className="space-y-2">
           {form.items.map((item, index) => (
             <div key={index} className="flex flex-col sm:flex-row gap-2 p-3 bg-gray-50 rounded-md border border-gray-100">
-              <input
-                value={item.bookName}
-                onChange={(e) => setItem(index, 'bookName', e.target.value)}
-                placeholder={t('orders.bookName')}
-                className={inputCls + ' sm:flex-1'}
-              />
-              <input
-                value={item.sku ?? ''}
-                onChange={(e) => setItem(index, 'sku', e.target.value)}
-                placeholder={t('orders.sku')}
-                className={inputCls + ' sm:w-32'}
-              />
-              <input
-                type="number"
-                min="1"
-                value={item.quantity}
-                onChange={(e) => setItem(index, 'quantity', e.target.value)}
-                placeholder={t('orders.quantity')}
-                className={inputCls + ' sm:w-24'}
-              />
+              <div className="sm:flex-1">
+                <label className="label sm:hidden">{t('orders.bookName')}</label>
+                <input
+                  value={item.bookName}
+                  onChange={(e) => setItem(index, 'bookName', e.target.value)}
+                  placeholder={t('orders.bookName')}
+                  className={inputCls}
+                />
+              </div>
+              <div className="sm:w-32">
+                <label className="label sm:hidden">{t('orders.sku')}</label>
+                <input
+                  value={item.sku ?? ''}
+                  onChange={(e) => setItem(index, 'sku', e.target.value)}
+                  placeholder={t('orders.sku')}
+                  className={inputCls}
+                />
+              </div>
+              <div className="sm:w-24">
+                <label className="label">{t('orders.quantity')}</label>
+                <input
+                  type="number"
+                  min="1"
+                  value={item.quantity}
+                  onChange={(e) => setItem(index, 'quantity', e.target.value)}
+                  className={inputCls}
+                />
+              </div>
               {form.items.length > 1 && (
                 <button
                   type="button"
                   onClick={() => removeItem(index)}
-                  className="flex-shrink-0 text-red-400 hover:text-red-600 px-2 self-center"
+                  className="flex-shrink-0 text-red-400 hover:text-red-600 px-2 self-end sm:self-center pb-2 sm:pb-0"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
