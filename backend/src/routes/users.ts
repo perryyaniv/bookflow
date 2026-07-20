@@ -12,22 +12,22 @@ router.get('/', async (_req: AuthRequest, res: Response) => {
 });
 
 router.post('/', async (req: AuthRequest, res: Response) => {
-  const { name, email, password, role, branchId } = req.body;
-  if (!name || !email || !password || !role) {
-    res.status(400).json({ message: 'name, email, password, role required' });
+  const { name, username, password, role, branchId } = req.body;
+  if (!name || !username || !password || !role) {
+    res.status(400).json({ message: 'name, username, password, role required' });
     return;
   }
-  const existing = await User.findOne({ email: email.toLowerCase() });
+  const existing = await User.findOne({ username: username.toLowerCase() });
   if (existing) {
-    res.status(409).json({ message: 'Email already exists' });
+    res.status(409).json({ message: 'Username already exists' });
     return;
   }
-  const user = await User.create({ name, email, password, role, branchId: branchId || null, forcePasswordChange: true });
+  const user = await User.create({ name, username, password, role, branchId: branchId || null, forcePasswordChange: true });
   await logAudit({ userId: req.user!.userId, userName: req.user!.name, action: `יצר משתמש ${name}` });
   res.status(201).json({
     _id: user._id,
     name: user.name,
-    email: user.email,
+    username: user.username,
     role: user.role,
     branchId: user.branchId,
     active: user.active,

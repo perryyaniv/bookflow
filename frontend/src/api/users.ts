@@ -4,7 +4,7 @@ import { User, UserRole } from '../types';
 export const getUsers = () =>
   client.get<User[]>('/users').then((r) => r.data);
 
-export const createUser = (data: { name: string; email: string; password: string; role: UserRole; branchId?: string }) =>
+export const createUser = (data: { name: string; username: string; password: string; role: UserRole; branchId?: string }) =>
   client.post<User>('/users', data).then((r) => r.data);
 
 export const updateUser = (id: string, data: { role?: UserRole; active?: boolean; branchId?: string | null; name?: string }) =>

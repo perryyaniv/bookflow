@@ -6,12 +6,12 @@ import { authenticate, AuthRequest } from '../middleware/auth';
 const router = Router();
 
 router.post('/login', async (req: Request, res: Response) => {
-  const { email, password } = req.body;
-  if (!email || !password) {
-    res.status(400).json({ message: 'Email and password required' });
+  const { username, password } = req.body;
+  if (!username || !password) {
+    res.status(400).json({ message: 'Username and password required' });
     return;
   }
-  const user = await User.findOne({ email: email.toLowerCase(), active: true });
+  const user = await User.findOne({ username: username.toLowerCase(), active: true });
   if (!user || !(await user.comparePassword(password))) {
     res.status(401).json({ message: 'Invalid credentials' });
     return;
@@ -26,7 +26,7 @@ router.post('/login', async (req: Request, res: Response) => {
     user: {
       _id: user._id,
       name: user.name,
-      email: user.email,
+      username: user.username,
       role: user.role,
       branchId: user.branchId,
       forcePasswordChange: user.forcePasswordChange,

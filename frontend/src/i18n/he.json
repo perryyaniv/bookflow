@@ -10,7 +10,7 @@
   },
   "auth": {
     "login": "התחברות",
-    "email": "דוא\"ל",
+    "username": "שם משתמש",
     "password": "סיסמה",
     "loginButton": "כניסה",
     "changePassword": "שינוי סיסמה",
@@ -56,7 +56,7 @@
     "page": "עמוד",
     "of": "מתוך",
     "notArrived": "לא הגיע",
-    "notCollected": "לא נאסף / בוטל"
+    "notCollected": "לא נאסף"
   },
   "status": {
     "נוצר": "נוצר",
@@ -73,7 +73,7 @@
     "notArrived": "לא הגיעו",
     "notCollected": "לא נאספו",
     "urgentNotArrived": "הזמנות שלא הגיעו",
-    "urgentNotCollected": "הזמנות שלא נאספו / בוטלו"
+    "urgentNotCollected": "הזמנות שלא נאספו"
   },
   "auditLog": {
     "title": "לוג שינויים",
@@ -90,7 +90,7 @@
     "title": "ניהול משתמשים",
     "addUser": "הוספת משתמש",
     "name": "שם מלא",
-    "email": "דוא\"ל",
+    "username": "שם משתמש",
     "role": "תפקיד",
     "branch": "סניף",
     "active": "פעיל",

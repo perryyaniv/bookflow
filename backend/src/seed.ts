@@ -10,16 +10,16 @@ async function seed() {
   await mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/bookflow');
   console.log('Connected');
 
-  const existing = await User.findOne({ email: 'admin@bookflow.local' });
+  const existing = await User.findOne({ username: 'admin' });
   if (!existing) {
     await User.create({
       name: 'מנהל',
-      email: 'admin@bookflow.local',
-      password: 'Admin123!',
+      username: 'admin',
+      password: 'admin',
       role: 'admin',
       forcePasswordChange: false,
     });
-    console.log('Created admin user (email: admin@bookflow.local, password: Admin123!)');
+    console.log('Created admin user (username: admin, password: admin)');
   }
 
   const branches = ['סניף 1', 'סניף 2'];

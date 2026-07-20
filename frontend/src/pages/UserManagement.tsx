@@ -22,7 +22,7 @@ export default function UserManagement() {
   const [loading, setLoading] = useState(true);
   const [addModal, setAddModal] = useState(false);
   const [resetModal, setResetModal] = useState<User | null>(null);
-  const [newUser, setNewUser] = useState({ name: '', email: '', password: '', role: 'clerk' as UserRole, branchId: '' });
+  const [newUser, setNewUser] = useState({ name: '', username: '', password: '', role: 'clerk' as UserRole, branchId: '' });
   const [tempPassword, setTempPassword] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -42,7 +42,7 @@ export default function UserManagement() {
       const user = await createUser({ ...newUser, branchId: newUser.branchId || undefined });
       setUsers((prev) => [user, ...prev]);
       setAddModal(false);
-      setNewUser({ name: '', email: '', password: '', role: 'clerk', branchId: '' });
+      setNewUser({ name: '', username: '', password: '', role: 'clerk', branchId: '' });
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
       setError(msg || 'שגיאה');
@@ -90,7 +90,7 @@ export default function UserManagement() {
           <thead className="bg-gray-50 border-b border-gray-200">
             <tr>
               <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase">{t('users.name')}</th>
-              <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase">{t('users.email')}</th>
+              <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase">{t('users.username')}</th>
               <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase">{t('users.role')}</th>
               <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase">{t('users.branch')}</th>
               <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase">{t('users.active')}</th>
@@ -102,7 +102,7 @@ export default function UserManagement() {
             {users.map((u) => (
               <tr key={u._id} className="hover:bg-gray-50">
                 <td className="px-4 py-3 font-medium text-gray-800">{u.name}</td>
-                <td className="px-4 py-3 text-gray-500">{u.email}</td>
+                <td className="px-4 py-3 text-gray-500">{u.username}</td>
                 <td className="px-4 py-3">
                   <select
                     value={u.role}
@@ -149,8 +149,8 @@ export default function UserManagement() {
             <input required value={newUser.name} onChange={(e) => setNewUser((f) => ({ ...f, name: e.target.value }))} className={inputCls} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{t('users.email')}</label>
-            <input required type="email" value={newUser.email} onChange={(e) => setNewUser((f) => ({ ...f, email: e.target.value }))} className={inputCls} />
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('users.username')}</label>
+            <input required type="text" value={newUser.username} onChange={(e) => setNewUser((f) => ({ ...f, username: e.target.value }))} className={inputCls} />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">{t('auth.password')} (זמנית)</label>

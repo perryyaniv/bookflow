@@ -13,7 +13,7 @@ export interface Branch {
 export interface User {
   _id: string;
   name: string;
-  email: string;
+  username: string;
   role: UserRole;
   branchId?: string | Branch | null;
   active: boolean;

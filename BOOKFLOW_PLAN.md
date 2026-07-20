@@ -37,7 +37,7 @@ The app will be built with a stack closely aligned to the reference project in C
 
 ### Alerting rules
 - “Not Arrived” is based on the Ordered date
-- “Not Collected / Cancelled” is based on the Customer Notified date
+- “Not Collected” is based on the Customer Notified date; Cancelled orders never trigger this warning
 - Thresholds are configurable by admins
 - Default thresholds: 14 days
 
