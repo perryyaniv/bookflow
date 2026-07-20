@@ -1,0 +1,25 @@
+{
+  "name": "BookFlow",
+  "short_name": "BookFlow",
+  "description": "ניהול הזמנות ספרים",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F2F7F5",
+  "theme_color": "#1F6F5C",
+  "dir": "rtl",
+  "lang": "he",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "sizes": "312x312",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon.png",
+      "sizes": "312x312",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
