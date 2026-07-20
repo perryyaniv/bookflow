@@ -14,7 +14,7 @@ import Spinner from './components/ui/Spinner';
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
-  if (loading) return <div className="min-h-screen bg-bg flex items-center justify-center"><Spinner /></div>;
+  if (loading) return <div className="min-h-dvh bg-bg flex items-center justify-center"><Spinner /></div>;
   if (!user) return <Navigate to="/login" replace />;
   if (user.forcePasswordChange) return <Navigate to="/change-password" replace />;
   return <>{children}</>;

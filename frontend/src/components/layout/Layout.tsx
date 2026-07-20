@@ -4,9 +4,9 @@ import BottomNav from './BottomNav';
 
 export default function Layout() {
   return (
-    <div className="min-h-screen bg-bg font-sans flex flex-col">
+    <div className="min-h-dvh bg-bg font-sans flex flex-col">
       <Header />
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 pb-20 md:pb-16">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-16">
         <Outlet />
       </main>
       {/* Desktop footer */}

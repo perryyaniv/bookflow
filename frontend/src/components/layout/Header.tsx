@@ -55,7 +55,7 @@ export default function Header() {
   return (
     <>
       <header className="sticky top-0 z-40 shadow-nav">
-        <div className="bg-primary px-4 sm:px-6">
+        <div className="bg-primary px-4 sm:px-6 pt-[env(safe-area-inset-top)]">
           <div className="max-w-7xl mx-auto relative flex items-center h-14">
 
             <div className="flex items-center gap-1 flex-none z-10">

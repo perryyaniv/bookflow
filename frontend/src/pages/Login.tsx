@@ -31,16 +31,16 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-bg flex flex-col items-center justify-center p-4">
+    <div className="min-h-dvh bg-bg flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-sm">
         <div className="bg-primary rounded-lg shadow-nav px-6 pt-5 pb-0 mb-0">
           <div className="flex items-center gap-3 mb-4">
-            <div className="bg-white rounded-md p-1.5">
-              <img src="/logo.png" alt="לוגו" className="h-10 w-auto" />
-            </div>
             <div>
               <h1 className="text-white font-bold text-xl leading-tight">BookFlow</h1>
               <p className="text-white/80 text-sm font-medium">ניהול הזמנות ספרים</p>
+            </div>
+            <div className="bg-white rounded-md p-1.5 mr-auto">
+              <img src="/logo.png" alt="לוגו" className="h-10 w-auto" />
             </div>
           </div>
           <div className="h-1 bg-accent -mx-6 rounded-b-none" />
