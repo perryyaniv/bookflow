@@ -164,7 +164,11 @@ export default function OrderDetail() {
                   <DetailRow label={t('orders.orderDate')} value={formatDate(order.orderDate)} />
                   <DetailRow label={t('orders.orderedFrom')} value={order.orderedFrom} />
                   <DetailRow label={t('orders.status')} value={<StatusBadge status={order.status} />} />
-                  <DetailRow label={t('orders.isPaid')} value={order.isPaid ? t('orders.paid') : t('orders.unpaid')} />
+                  <DetailRow label={t('orders.isPaid')} value={
+                    <span className={order.isPaid ? 'text-green-600' : 'text-red-500'}>
+                      {order.isPaid ? t('orders.paid') : t('orders.unpaid')}
+                    </span>
+                  } />
                   <DetailRow label={t('orders.orderedAt')} value={formatDate(order.orderedAt)} />
                   <DetailRow label={t('orders.customerNotifiedAt')} value={formatDate(order.customerNotifiedAt)} />
                 </div>
