@@ -46,7 +46,7 @@ export default function Layout() {
     const currentIndex = tabs.indexOf(getActiveTabPath(location.pathname, tabs) ?? '');
     if (currentIndex === -1) return;
 
-    const nextIndex = dx < 0 ? currentIndex + 1 : currentIndex - 1;
+    const nextIndex = dx > 0 ? currentIndex + 1 : currentIndex - 1;
     if (nextIndex >= 0 && nextIndex < tabs.length) {
       navigate(tabs[nextIndex]);
     }
