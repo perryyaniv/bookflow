@@ -72,13 +72,18 @@ export default function Dashboard() {
     setOrders((prev) => prev.map((o) => (o._id === updated._id ? updated : o)));
   };
 
+  const visibleOrders = useMemo(
+    () => (statusFilter === 'בוטל' ? orders : orders.filter((o) => o.status !== 'בוטל')),
+    [orders, statusFilter]
+  );
+
   const rows = useMemo(
-    () => orders.map((order) => ({
+    () => visibleOrders.map((order) => ({
       order,
       level: getAlertLevel(order, thresholds),
       age: getAlertAgeDays(order),
     })),
-    [orders, thresholds]
+    [visibleOrders, thresholds]
   );
 
   const filteredRows = useMemo(() => {
@@ -113,8 +118,8 @@ export default function Dashboard() {
     });
   }, [filteredRows]);
 
-  const total = orders.length;
-  const alarms = orders.filter((o) => o.isNotArrived || o.isNotCollected).length;
+  const total = visibleOrders.length;
+  const alarms = visibleOrders.filter((o) => o.isNotArrived || o.isNotCollected).length;
   const totalPages = Math.max(1, Math.ceil(sortedRows.length / PAGE_SIZE));
   const pagedRows = sortedRows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
