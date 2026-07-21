@@ -31,12 +31,20 @@ async function getThresholds() {
   };
 }
 
-function withAlerts<T extends { status: OrderStatus; orderedAt?: Date | null; customerNotifiedAt?: Date | null }>(
+function withAlerts<T extends {
+  status: OrderStatus;
+  orderedAt?: Date | null;
+  customerNotifiedAt?: Date | null;
+  statusChangedAt?: Date | null;
+  updatedAt?: Date;
+  createdAt?: Date;
+}>(
   order: T,
   thresholds: { notArrivedThresholdDays: number; notCollectedThresholdDays: number }
 ) {
   return {
     ...order,
+    statusChangedAt: order.statusChangedAt ?? order.updatedAt ?? order.createdAt,
     isNotArrived: isNotArrived(order, thresholds.notArrivedThresholdDays),
     isNotCollected: isNotCollected(order, thresholds.notCollectedThresholdDays),
   };
