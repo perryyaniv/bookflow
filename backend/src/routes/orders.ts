@@ -10,8 +10,35 @@ import { asyncHandler } from '../utils/asyncHandler';
 const ARRIVAL_ADVANCEABLE: OrderStatus[] = ['נוצר', 'הוזמן', 'הגיע חלקית', 'הגיע'];
 const ARRIVED_OR_LATER: OrderStatus[] = ['הגיע', 'הלקוח עודכן', 'נאסף'];
 
+const STATUS_RANK: Record<OrderStatus, number> = {
+  'נוצר': 0,
+  'הוזמן': 1,
+  'הגיע חלקית': 2,
+  'הגיע': 3,
+  'הלקוח עודכן': 4,
+  'נאסף': 5,
+  'בוטל': -1,
+};
+
 function supportsPartialArrival(itemCount: number): boolean {
   return itemCount > 1;
+}
+
+// When status moves backward past the point where orderedAt/customerNotifiedAt
+// were stamped, those dates no longer reflect reality and should be cleared.
+function dateFieldsToClearOnBackwardMove(oldStatus: OrderStatus, newStatus: OrderStatus): {
+  orderedAt?: null;
+  customerNotifiedAt?: null;
+} {
+  if (oldStatus === 'בוטל' || newStatus === 'בוטל') return {};
+  const oldRank = STATUS_RANK[oldStatus];
+  const newRank = STATUS_RANK[newStatus];
+  if (newRank >= oldRank) return {};
+
+  const updates: { orderedAt?: null; customerNotifiedAt?: null } = {};
+  if (newRank < STATUS_RANK['הלקוח עודכן']) updates.customerNotifiedAt = null;
+  if (newRank < STATUS_RANK['הוזמן']) updates.orderedAt = null;
+  return updates;
 }
 
 function statusFromItemArrivals(items: IOrderItem[], currentStatus: OrderStatus): OrderStatus {
@@ -35,7 +62,7 @@ const FIELD_LABELS: Record<string, string> = {
   orderedFrom: 'הוזמן מ',
   customerName: 'שם הלקוח',
   customerPhone: 'טלפון',
-  orderDate: 'תאריך הזמנה',
+  orderDate: 'תאריך יצירת ההזמנה',
 };
 
 function formatLogValue(field: string, value: unknown): string {
@@ -167,6 +194,7 @@ router.put('/:id', requireWriteAccess, asyncHandler<AuthRequest>(async (req, res
     if (newStatus === 'הוזמן' && !existing.orderedAt) update.orderedAt = new Date();
     if (newStatus === 'הלקוח עודכן' && !existing.customerNotifiedAt) update.customerNotifiedAt = new Date();
     update.statusChangedAt = new Date();
+    Object.assign(update, dateFieldsToClearOnBackwardMove(existing.status, newStatus));
   }
 
   const effectiveStatus = (newStatus ?? existing.status) as OrderStatus;
@@ -225,7 +253,12 @@ router.patch('/:id/status', requireWriteAccess, asyncHandler<AuthRequest>(async 
   if (status === 'הוזמן' && !existing.orderedAt) existing.orderedAt = new Date();
   if (ARRIVED_OR_LATER.includes(status)) existing.items.forEach((i) => { i.arrived = true; });
   if (status === 'הלקוח עודכן' && !existing.customerNotifiedAt) existing.customerNotifiedAt = new Date();
-  if (status !== oldStatus) existing.statusChangedAt = new Date();
+  if (status !== oldStatus) {
+    existing.statusChangedAt = new Date();
+    const clears = dateFieldsToClearOnBackwardMove(oldStatus, status);
+    if (clears.orderedAt === null) existing.orderedAt = null;
+    if (clears.customerNotifiedAt === null) existing.customerNotifiedAt = null;
+  }
   await existing.save();
 
   const populated = await Order.findById(existing._id).populate('branchId', 'name').lean();
@@ -273,7 +306,12 @@ router.patch('/:id/items/:index/arrived', requireWriteAccess, asyncHandler<AuthR
   existing.updatedBy = req.user!.userId as never;
   if (ARRIVED_OR_LATER.includes(newStatus)) existing.items.forEach((i) => { i.arrived = true; });
   if ((newStatus === 'הגיע' || newStatus === 'הגיע חלקית') && !existing.orderedAt) existing.orderedAt = new Date();
-  if (newStatus !== oldStatus) existing.statusChangedAt = new Date();
+  if (newStatus !== oldStatus) {
+    existing.statusChangedAt = new Date();
+    const clears = dateFieldsToClearOnBackwardMove(oldStatus, newStatus);
+    if (clears.orderedAt === null) existing.orderedAt = null;
+    if (clears.customerNotifiedAt === null) existing.customerNotifiedAt = null;
+  }
   await existing.save();
 
   await logAudit({

@@ -12,7 +12,7 @@ const FIELD_LABELS: Record<string, string> = {
   orderedFrom: 'הוזמן מ',
   customerName: 'שם הלקוח',
   customerPhone: 'טלפון',
-  orderDate: 'תאריך הזמנה',
+  orderDate: 'תאריך יצירת ההזמנה',
 };
 
 function formatFieldValue(field: string, value?: string): string {

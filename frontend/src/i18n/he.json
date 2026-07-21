@@ -27,7 +27,7 @@
     "customerPhone": "טלפון",
     "branch": "סניף",
     "orderedFromBranch": "סניף היעד",
-    "orderDate": "תאריך הזמנה",
+    "orderDate": "תאריך יצירת ההזמנה",
     "orderedFrom": "הוזמן מ",
     "isPaid": "שולם",
     "paid": "שולם",
