@@ -64,7 +64,7 @@ export default function OrderAlertTable({ rows }: Props) {
               <td className="px-4 py-3"><StatusBadge status={order.status} /></td>
               <td className="px-4 py-3 text-gray-600">{bookNames(order)}</td>
               <td className="px-4 py-3">
-                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${order.isPaid ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}>
+                <span className={`text-xs font-bold ${order.isPaid ? 'text-green-700' : 'text-red-600'}`}>
                   {order.isPaid ? t('orders.paid') : t('orders.unpaid')}
                 </span>
               </td>
