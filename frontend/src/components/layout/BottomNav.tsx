@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
+import { getNavTabs, getActiveTabPath } from './navTabs';
 
 export default function BottomNav() {
   const { t } = useTranslation();
@@ -8,15 +9,8 @@ export default function BottomNav() {
   const location = useLocation();
   const isAdmin = user?.role === 'admin';
 
-  const tabPaths = ['/orders', '/orders/new', '/settings'];
-
-  const isActive = (to: string) => {
-    if (to === '/') return location.pathname === '/';
-    const match = tabPaths
-      .filter((p) => location.pathname === p || location.pathname.startsWith(p + '/'))
-      .sort((a, b) => b.length - a.length)[0];
-    return match === to;
-  };
+  const activePath = getActiveTabPath(location.pathname, getNavTabs(isAdmin));
+  const isActive = (to: string) => to === activePath;
 
   const tab = (to: string, label: string, icon: React.ReactNode) => {
     const active = isActive(to);
