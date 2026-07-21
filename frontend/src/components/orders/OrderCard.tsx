@@ -83,12 +83,12 @@ export default function OrderCard({ order, level, onStatusChanged }: Props) {
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <h3 className="font-bold text-gray-900 text-sm leading-tight group-hover:text-primary transition-colors truncate">
+            <h3 className="font-bold text-gray-900 text-xs leading-tight group-hover:text-primary transition-colors truncate">
               {order.customerName}
             </h3>
             {alertMsg && (
-              <span className={`flex items-center gap-1 font-bold text-sm leading-tight flex-shrink-0 ${ALERT_TEXT_COLOR[level]}`}>
-                <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <span className={`flex items-center gap-1 font-bold text-xs leading-tight flex-shrink-0 ${ALERT_TEXT_COLOR[level]}`}>
+                <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
                 </svg>
                 {alertMsg}

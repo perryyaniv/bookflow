@@ -37,7 +37,8 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [orders, setOrders] = useState<Order[]>([]);
   const [thresholds, setThresholds] = useState({ notArrivedThresholdDays: 14, notCollectedThresholdDays: 14 });
-  const [view, setView] = useState<'cards' | 'table'>('table');
+  const [view, setView] = useState<'cards' | 'table'>('cards');
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [search, setSearch] = useState(searchParams.get('search') ?? '');
   const [statusFilter, setStatusFilter] = useState<OrderStatus | ''>('');
   const [alertFilter, setAlertFilter] = useState<'' | 'alert' | 'none'>('');
@@ -127,12 +128,24 @@ export default function Dashboard() {
       </div>
 
       <div className="flex items-center gap-2 flex-wrap justify-between">
-        <input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder={t('common.search')}
-          className="input flex-1 min-w-[160px]"
-        />
+        <div className="flex items-center gap-2 flex-1 min-w-[200px]">
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder={t('common.search')}
+            className="input flex-1"
+          />
+          <button
+            onClick={() => setFiltersOpen((o) => !o)}
+            title={t('orders.filters')}
+            aria-label={t('orders.filters')}
+            className={`flex-shrink-0 p-2 rounded-md border transition-colors ${filtersOpen ? 'bg-primary text-white border-primary' : 'border-gray-200 text-gray-500 hover:bg-gray-50'}`}
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h18M6 9h12M10 14h4" />
+            </svg>
+          </button>
+        </div>
         <div className="flex items-center border border-gray-200 rounded-md overflow-hidden flex-shrink-0">
           <button
             onClick={() => setView('cards')}
@@ -149,40 +162,42 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="flex items-center gap-2 flex-wrap">
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value as OrderStatus | '')}
-          className="input w-auto"
-        >
-          <option value="">{t('orders.filterAllStatuses')}</option>
-          {ORDER_STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
-        </select>
-        <select
-          value={alertFilter}
-          onChange={(e) => setAlertFilter(e.target.value as '' | 'alert' | 'none')}
-          className="input w-auto"
-        >
-          <option value="">{t('orders.filterAllAlerts')}</option>
-          <option value="alert">{t('orders.filterHasAlert')}</option>
-          <option value="none">{t('orders.filterNoAlert')}</option>
-        </select>
-        <select
-          value={paidFilter}
-          onChange={(e) => setPaidFilter(e.target.value as '' | 'true' | 'false')}
-          className="input w-auto"
-        >
-          <option value="">{t('orders.filterAllPaid')}</option>
-          <option value="true">{t('orders.paid')}</option>
-          <option value="false">{t('orders.unpaid')}</option>
-        </select>
-        <input
-          value={customerFilter}
-          onChange={(e) => setCustomerFilter(e.target.value)}
-          placeholder={t('orders.customerName')}
-          className="input w-auto min-w-[140px]"
-        />
-      </div>
+      {filtersOpen && (
+        <div className="flex items-center gap-2 flex-wrap">
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value as OrderStatus | '')}
+            className="input w-auto"
+          >
+            <option value="">{t('orders.filterAllStatuses')}</option>
+            {ORDER_STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+          </select>
+          <select
+            value={alertFilter}
+            onChange={(e) => setAlertFilter(e.target.value as '' | 'alert' | 'none')}
+            className="input w-auto"
+          >
+            <option value="">{t('orders.filterAllAlerts')}</option>
+            <option value="alert">{t('orders.filterHasAlert')}</option>
+            <option value="none">{t('orders.filterNoAlert')}</option>
+          </select>
+          <select
+            value={paidFilter}
+            onChange={(e) => setPaidFilter(e.target.value as '' | 'true' | 'false')}
+            className="input w-auto"
+          >
+            <option value="">{t('orders.filterAllPaid')}</option>
+            <option value="true">{t('orders.paid')}</option>
+            <option value="false">{t('orders.unpaid')}</option>
+          </select>
+          <input
+            value={customerFilter}
+            onChange={(e) => setCustomerFilter(e.target.value)}
+            placeholder={t('orders.customerName')}
+            className="input w-auto min-w-[140px]"
+          />
+        </div>
+      )}
 
       {sortedRows.length === 0 ? (
         <div className="text-center py-20">
