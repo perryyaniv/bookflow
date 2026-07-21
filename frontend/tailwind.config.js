@@ -39,14 +39,14 @@ export default {
           '0%, 100%': { opacity: '1' },
           '50%': { opacity: '0.25' },
         },
-        'breathe-bg': {
-          '0%, 100%': { backgroundColor: '#FFFFFF' },
-          '50%': { backgroundColor: '#FEE2E2' },
+        'breathe-border': {
+          '0%, 100%': { boxShadow: '0 0 0 0 rgba(239, 68, 68, 0)' },
+          '50%': { boxShadow: '0 0 0 3px rgba(239, 68, 68, 0.55)' },
         },
       },
       animation: {
         breathe: 'breathe 1.6s ease-in-out infinite',
-        'breathe-bg': 'breathe-bg 3s ease-in-out infinite',
+        'breathe-border': 'breathe-border 3s ease-in-out infinite',
       },
     },
   },

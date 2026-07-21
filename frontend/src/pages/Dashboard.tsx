@@ -8,7 +8,6 @@ import { getAlertLevel, getAlertAgeDays, AlertLevel } from '../utils/alertLevel'
 import { useAuth } from '../contexts/AuthContext';
 import { hasWriteAccess } from '../utils/roles';
 import OrderCard from '../components/orders/OrderCard';
-import OrderAlertTable from '../components/orders/OrderAlertTable';
 import Button from '../components/ui/Button';
 import Spinner from '../components/ui/Spinner';
 
@@ -42,7 +41,6 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [orders, setOrders] = useState<Order[]>([]);
   const [thresholds, setThresholds] = useState({ notArrivedThresholdDays: 14, notCollectedThresholdDays: 14 });
-  const [view, setView] = useState<'cards' | 'table'>('cards');
   const [scope, setScope] = useState<'inProgress' | 'all' | 'alerts'>('inProgress');
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [search, setSearch] = useState(searchParams.get('search') ?? '');
@@ -184,20 +182,6 @@ export default function Dashboard() {
             {t('orders.scopeAlerts')}
           </button>
         </div>
-        <div className="flex items-center border border-gray-200 rounded-md overflow-hidden flex-shrink-0">
-          <button
-            onClick={() => setView('cards')}
-            className={`px-3 py-1.5 text-sm transition-colors ${view === 'cards' ? 'bg-primary text-white' : 'text-gray-500 hover:bg-gray-50'}`}
-          >
-            {t('orders.cardsView')}
-          </button>
-          <button
-            onClick={() => setView('table')}
-            className={`px-3 py-1.5 text-sm transition-colors ${view === 'table' ? 'bg-primary text-white' : 'text-gray-500 hover:bg-gray-50'}`}
-          >
-            {t('orders.tableView')}
-          </button>
-        </div>
       </div>
 
       {filtersOpen && (
@@ -250,15 +234,11 @@ export default function Dashboard() {
         </div>
       ) : (
         <>
-          {view === 'cards' ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-              {pagedRows.map(({ order, level }) => (
-                <OrderCard key={order._id} order={order} level={level} canWrite={canWrite} onStatusChanged={handleStatusChanged} />
-              ))}
-            </div>
-          ) : (
-            <OrderAlertTable rows={pagedRows} />
-          )}
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            {pagedRows.map(({ order, level }) => (
+              <OrderCard key={order._id} order={order} level={level} canWrite={canWrite} onStatusChanged={handleStatusChanged} />
+            ))}
+          </div>
 
           {totalPages > 1 && (
             <div className="flex items-center justify-center gap-2 pt-4">

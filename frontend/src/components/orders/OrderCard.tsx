@@ -107,7 +107,7 @@ export default function OrderCard({ order, level, canWrite, onStatusChanged }: P
   return (
     <div
       onClick={() => setExpanded((e) => !e)}
-      className={`card cursor-pointer hover:shadow-md transition-all group flex flex-col ${STATUS_ACCENT_BORDER[order.status]} ${level === 'red' ? 'animate-breathe-bg' : ''}`}
+      className={`card cursor-pointer hover:shadow-md transition-all group flex flex-col ${STATUS_ACCENT_BORDER[order.status]} ${level === 'red' ? 'animate-breathe-border' : ''}`}
     >
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="flex-1 min-w-0">
