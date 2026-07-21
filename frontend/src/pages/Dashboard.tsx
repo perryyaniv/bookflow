@@ -170,16 +170,16 @@ export default function Dashboard() {
             {t('orders.scopeInProgress')}
           </button>
           <button
-            onClick={() => setScope('all')}
-            className={`px-3 py-1.5 text-sm transition-colors ${scope === 'all' ? 'bg-primary text-white' : 'text-gray-500 hover:bg-gray-50'}`}
-          >
-            {t('orders.scopeAll')}
-          </button>
-          <button
             onClick={() => setScope('alerts')}
             className={`px-3 py-1.5 text-sm transition-colors ${scope === 'alerts' ? 'bg-primary text-white' : 'text-gray-500 hover:bg-gray-50'}`}
           >
             {t('orders.scopeAlerts')}
+          </button>
+          <button
+            onClick={() => setScope('all')}
+            className={`px-3 py-1.5 text-sm transition-colors ${scope === 'all' ? 'bg-primary text-white' : 'text-gray-500 hover:bg-gray-50'}`}
+          >
+            {t('orders.scopeAll')}
           </button>
         </div>
       </div>

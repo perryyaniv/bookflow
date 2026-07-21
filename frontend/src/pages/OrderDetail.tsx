@@ -196,7 +196,7 @@ export default function OrderDetail() {
                   <DetailRow label={t('orders.orderedFrom')} value={order.orderedFrom} />
                   <DetailRow label={t('orders.status')} value={<StatusBadge status={order.status} />} />
                   <DetailRow label={t('orders.isPaid')} value={
-                    <span className={`font-bold ${order.isPaid ? 'text-primary' : 'text-red-500 animate-breathe'}`}>
+                    <span className={`font-bold ${order.isPaid ? 'text-primary' : 'text-red-500'}`}>
                       {order.isPaid ? t('orders.paid') : t('orders.unpaid')}
                     </span>
                   } />
