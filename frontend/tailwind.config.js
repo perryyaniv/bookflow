@@ -34,6 +34,15 @@ export default {
         card: '0 1px 3px 0 rgba(0,0,0,0.07)',
         nav: '0 2px 8px 0 rgba(31,111,92,0.15)',
       },
+      keyframes: {
+        blink: {
+          '0%, 49%': { opacity: '1' },
+          '50%, 100%': { opacity: '0' },
+        },
+      },
+      animation: {
+        blink: 'blink 1s steps(1) infinite',
+      },
     },
   },
   plugins: [],
