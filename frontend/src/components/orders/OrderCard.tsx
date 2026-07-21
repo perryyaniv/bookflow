@@ -109,6 +109,15 @@ export default function OrderCard({ order, level, canWrite, onStatusChanged }: P
       onClick={() => setExpanded((e) => !e)}
       className={`card cursor-pointer hover:shadow-md transition-all group flex flex-col ${STATUS_ACCENT_BORDER[order.status]}`}
     >
+      {order.isPaid && (
+        <div className="flex items-center justify-center gap-1.5 mb-2">
+          <svg className="w-4 h-4 text-primary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+          </svg>
+          <span className="text-base font-extrabold text-primary">{t('orders.paid')}</span>
+        </div>
+      )}
+
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
@@ -164,15 +173,6 @@ export default function OrderCard({ order, level, canWrite, onStatusChanged }: P
           <StatusBadge status={order.status} />
         )}
       </div>
-
-      {order.isPaid && (
-        <div className="flex items-center justify-center gap-1.5">
-          <svg className="w-4 h-4 text-primary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-          </svg>
-          <span className="text-base font-extrabold text-primary">{t('orders.paid')}</span>
-        </div>
-      )}
 
       {order.items?.length > 0 && (
         <div className="mt-1.5 space-y-1">
