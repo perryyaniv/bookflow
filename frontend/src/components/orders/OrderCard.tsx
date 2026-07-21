@@ -165,18 +165,23 @@ export default function OrderCard({ order, level, canWrite, onStatusChanged }: P
 
       {expanded && (
         <div
-          className="mt-3 pt-3 border-t border-gray-100 flex items-center gap-2"
+          className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between gap-2"
           onClick={(e) => e.stopPropagation()}
         >
+          <button
+            onClick={(e) => { e.stopPropagation(); navigate(`/orders/${order._id}`); }}
+            className="flex-shrink-0 px-3 py-1.5 rounded-md text-xs font-semibold text-white bg-green-600 hover:bg-green-700 transition-colors"
+          >
+            {t('orders.details')}
+          </button>
           {!isTerminal && canWrite && nextStatus && (
             <div className="relative flex-1 flex">
               <button
                 onClick={handleAdvanceClick}
                 disabled={changing}
                 title={`שנה סטטוס ל-${nextStatus}`}
-                className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-r-md rounded-l-none text-xs font-semibold transition-colors bg-primary text-white hover:bg-primary-dark"
+                className="flex-1 flex items-center justify-center px-3 py-1.5 rounded-r-md rounded-l-none text-xs font-semibold transition-colors bg-primary text-white hover:bg-primary-dark"
               >
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
                 {nextStatus}
               </button>
               <button
@@ -216,20 +221,11 @@ export default function OrderCard({ order, level, canWrite, onStatusChanged }: P
               onClick={handleCancelClick}
               disabled={changing}
               title="בטל הזמנה"
-              className="px-3 py-1.5 rounded-md text-xs font-semibold text-red-500 hover:bg-red-50 transition-colors border border-red-200 hover:border-red-300"
+              className="flex-shrink-0 px-3 py-1.5 rounded-md text-xs font-semibold text-red-500 hover:bg-red-50 transition-colors border border-red-200 hover:border-red-300"
             >
               בוטל
             </button>
           )}
-          <button
-            onClick={(e) => { e.stopPropagation(); navigate(`/orders/${order._id}`); }}
-            className="flex-shrink-0 px-3 py-1.5 rounded-md text-xs font-semibold text-primary border border-primary/30 hover:bg-primary/5 transition-colors flex items-center gap-1"
-          >
-            {t('orders.details')}
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
         </div>
       )}
 
