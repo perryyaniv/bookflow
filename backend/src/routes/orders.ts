@@ -9,6 +9,7 @@ import { asyncHandler } from '../utils/asyncHandler';
 
 const ARRIVAL_ADVANCEABLE: OrderStatus[] = ['נוצר', 'הוזמן', 'הגיע חלקית', 'הגיע'];
 const ARRIVED_OR_LATER: OrderStatus[] = ['הגיע', 'הלקוח עודכן', 'נאסף'];
+const NOT_ARRIVED_STATUSES: OrderStatus[] = ['נוצר', 'הוזמן'];
 
 const STATUS_RANK: Record<OrderStatus, number> = {
   'נוצר': 0,
@@ -200,6 +201,8 @@ router.put('/:id', requireWriteAccess, asyncHandler<AuthRequest>(async (req, res
   const effectiveStatus = (newStatus ?? existing.status) as OrderStatus;
   if (ARRIVED_OR_LATER.includes(effectiveStatus)) {
     update.items = effectiveItems.map((it) => ({ ...it, arrived: true }));
+  } else if (NOT_ARRIVED_STATUSES.includes(effectiveStatus)) {
+    update.items = effectiveItems.map((it) => ({ ...it, arrived: false }));
   }
 
   const io: Server = req.app.get('io');
@@ -252,6 +255,7 @@ router.patch('/:id/status', requireWriteAccess, asyncHandler<AuthRequest>(async 
   existing.updatedBy = req.user!.userId as never;
   if (status === 'הוזמן' && !existing.orderedAt) existing.orderedAt = new Date();
   if (ARRIVED_OR_LATER.includes(status)) existing.items.forEach((i) => { i.arrived = true; });
+  else if (NOT_ARRIVED_STATUSES.includes(status)) existing.items.forEach((i) => { i.arrived = false; });
   if (status === 'הלקוח עודכן' && !existing.customerNotifiedAt) existing.customerNotifiedAt = new Date();
   if (status !== oldStatus) {
     existing.statusChangedAt = new Date();
@@ -305,6 +309,7 @@ router.patch('/:id/items/:index/arrived', requireWriteAccess, asyncHandler<AuthR
   existing.status = newStatus;
   existing.updatedBy = req.user!.userId as never;
   if (ARRIVED_OR_LATER.includes(newStatus)) existing.items.forEach((i) => { i.arrived = true; });
+  else if (NOT_ARRIVED_STATUSES.includes(newStatus)) existing.items.forEach((i) => { i.arrived = false; });
   if ((newStatus === 'הגיע' || newStatus === 'הגיע חלקית') && !existing.orderedAt) existing.orderedAt = new Date();
   if (newStatus !== oldStatus) {
     existing.statusChangedAt = new Date();
