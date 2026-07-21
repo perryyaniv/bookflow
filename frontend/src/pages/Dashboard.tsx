@@ -17,9 +17,9 @@ const colorMap: Record<CardColor, { border: string; num: string }> = {
 function StatCard({ label, value, color = 'gray' }: { label: string; value: number; color?: CardColor }) {
   const { border, num } = colorMap[color];
   return (
-    <div className={`bg-white border border-gray-100 border-r-4 ${border} rounded-lg shadow-card px-3 py-3 flex flex-col items-center justify-center text-center`}>
+    <div className={`bg-white border border-gray-100 border-r-4 ${border} rounded-lg shadow-card px-3 py-1.5 flex flex-col items-center justify-center text-center`}>
+      <p className="text-[10px] text-gray-400 font-medium">{label}</p>
       <p className={`text-lg font-bold leading-none ${num}`}>{value}</p>
-      <p className="text-[10px] text-gray-400 font-medium mt-0.5">{label}</p>
     </div>
   );
 }
@@ -47,17 +47,17 @@ export default function Dashboard() {
   }, []);
 
   const total = allOrders.length;
-  const open = allOrders.filter((o) => o.status !== 'נאסף' && o.status !== 'בוטל').length;
+  const inProgress = allOrders.filter((o) => o.status !== 'נאסף' && o.status !== 'בוטל').length;
+  const alarms = notArrived.length + notCollected.length;
 
   if (loading) return <Spinner />;
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid grid-cols-3 gap-2">
         <StatCard label={t('dashboard.totalOrders')} value={total} color="gray" />
-        <StatCard label={t('dashboard.openOrders')} value={open} color="blue" />
-        <StatCard label={t('dashboard.notArrived')} value={notArrived.length} color="red" />
-        <StatCard label={t('dashboard.notCollected')} value={notCollected.length} color="red" />
+        <StatCard label={t('dashboard.inProgress')} value={inProgress} color="blue" />
+        <StatCard label={t('dashboard.alarms')} value={alarms} color="red" />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

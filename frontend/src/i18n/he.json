@@ -72,6 +72,8 @@
     "title": "לוח בקרה",
     "totalOrders": "סה\"כ הזמנות",
     "openOrders": "הזמנות פתוחות",
+    "inProgress": "בתהליך",
+    "alarms": "התראות",
     "notArrived": "לא הגיעו",
     "notCollected": "לא נאספו",
     "urgentNotArrived": "הזמנות שלא הגיעו",
