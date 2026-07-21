@@ -24,6 +24,25 @@ const requireWriteAccess = requireRole('admin', 'editor');
 
 const TRACKED_FIELDS = ['status', 'isPaid', 'orderedFrom', 'customerName', 'customerPhone', 'orderDate'];
 
+const FIELD_LABELS: Record<string, string> = {
+  status: 'סטטוס',
+  isPaid: 'שולם',
+  orderedFrom: 'הוזמן מ',
+  customerName: 'שם הלקוח',
+  customerPhone: 'טלפון',
+  orderDate: 'תאריך הזמנה',
+};
+
+function formatLogValue(field: string, value: unknown): string {
+  if (value === undefined || value === null || value === '') return '—';
+  if (field === 'isPaid') return value === true || value === 'true' ? 'כן' : 'לא';
+  if (field === 'orderDate') {
+    const d = new Date(value as string);
+    if (!isNaN(d.getTime())) return d.toLocaleDateString('he-IL');
+  }
+  return String(value);
+}
+
 async function getThresholds() {
   const settings = await AppSettings.findOne().lean();
   return {
@@ -148,11 +167,12 @@ router.put('/:id', requireWriteAccess, asyncHandler<AuthRequest>(async (req, res
     const oldVal = (existing as Record<string, unknown>)[field];
     const newVal = (req.body as Record<string, unknown>)[field];
     if (newVal !== undefined && String(oldVal) !== String(newVal)) {
+      const label = FIELD_LABELS[field] ?? field;
       await logAudit({
         userId: req.user!.userId,
         userName: req.user!.name,
         orderId: req.params.id,
-        action: 'עדכן שדה',
+        action: `עדכן ${label}: "${formatLogValue(field, oldVal)}" → "${formatLogValue(field, newVal)}"`,
         fieldChanged: field,
         oldValue: oldVal,
         newValue: newVal,
@@ -192,7 +212,7 @@ router.patch('/:id/status', requireWriteAccess, asyncHandler<AuthRequest>(async 
     userId: req.user!.userId,
     userName: req.user!.name,
     orderId: existing._id.toString(),
-    action: 'שינה סטטוס',
+    action: `שינה סטטוס: "${oldStatus}" → "${status}"`,
     fieldChanged: 'status',
     oldValue: oldStatus,
     newValue: status,
@@ -240,7 +260,7 @@ router.patch('/:id/items/:index/arrived', requireWriteAccess, asyncHandler<AuthR
       userId: req.user!.userId,
       userName: req.user!.name,
       orderId: existing._id.toString(),
-      action: 'שינה סטטוס',
+      action: `שינה סטטוס: "${oldStatus}" → "${newStatus}"`,
       fieldChanged: 'status',
       oldValue: oldStatus,
       newValue: newStatus,
