@@ -175,17 +175,17 @@ export default function OrderCard({ order, level, canWrite, onStatusChanged }: P
 
       {expanded && (
         <div
-          className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between gap-2"
+          className="mt-3 pt-3 border-t border-gray-100 grid grid-cols-3 gap-2"
           onClick={(e) => e.stopPropagation()}
         >
           <button
             onClick={(e) => { e.stopPropagation(); navigate(`/orders/${order._id}`); }}
-            className="flex-1 min-w-0 px-3 py-1.5 rounded-md text-xs font-semibold text-white bg-amber-500 hover:bg-amber-600 transition-colors truncate"
+            className="min-w-0 px-3 py-1.5 rounded-md text-xs font-semibold text-white bg-amber-500 hover:bg-amber-600 transition-colors truncate"
           >
             {t('orders.details')}
           </button>
           {!isTerminal && canWrite && nextStatus && (
-            <div className="relative flex-1 min-w-0 flex">
+            <div className="relative min-w-0 flex">
               <button
                 onClick={handleAdvanceClick}
                 disabled={changing}
@@ -231,7 +231,7 @@ export default function OrderCard({ order, level, canWrite, onStatusChanged }: P
               onClick={handleCancelClick}
               disabled={changing}
               title="בטל הזמנה"
-              className="flex-1 min-w-0 px-3 py-1.5 rounded-md text-xs font-semibold text-red-500 hover:bg-red-50 transition-colors border border-red-200 hover:border-red-300 truncate"
+              className="min-w-0 px-3 py-1.5 rounded-md text-xs font-semibold text-red-500 hover:bg-red-50 transition-colors border border-red-200 hover:border-red-300 truncate"
             >
               בוטל
             </button>
