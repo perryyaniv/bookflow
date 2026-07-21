@@ -40,6 +40,7 @@ export default function OrderCard({ order, level, canWrite, onStatusChanged }: P
   const { showToast } = useToast();
   const [confirmStatus, setConfirmStatus] = useState<OrderStatus | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [expanded, setExpanded] = useState(false);
 
   const nextStatus = NEXT_STATUS[order.status];
   const isTerminal = order.status === 'נאסף' || order.status === 'בוטל';
@@ -81,7 +82,7 @@ export default function OrderCard({ order, level, canWrite, onStatusChanged }: P
 
   return (
     <div
-      onClick={() => navigate(`/orders/${order._id}`)}
+      onClick={() => setExpanded((e) => !e)}
       className="card cursor-pointer hover:shadow-md hover:border-r-primary-dark transition-all group flex flex-col"
     >
       <div className="flex items-start justify-between gap-3 mb-3">
@@ -104,38 +105,78 @@ export default function OrderCard({ order, level, canWrite, onStatusChanged }: P
         <StatusBadge status={order.status} />
       </div>
 
-      <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 flex-1">
-        <span className="label mb-0">{t('orders.branch')}</span>
-        <span className="text-xs text-gray-700 font-medium">{order.branchId?.name ?? '—'}</span>
-
-        <span className="label mb-0">{t('orders.orderDate')}</span>
-        <span className="text-xs text-gray-700">{formatDate(order.orderDate)}</span>
-
-        <span className={`text-xs font-bold col-span-2 ${order.isPaid ? 'text-green-600' : 'text-red-500 animate-breathe'}`}>
+      <div className="flex items-center justify-between gap-2">
+        <span className={`text-xs font-bold ${order.isPaid ? 'text-green-600' : 'text-red-500 animate-breathe'}`}>
           {order.isPaid ? t('orders.paid') : t('orders.unpaid')}
         </span>
       </div>
 
       {order.items?.length > 0 && (
-        <div className="mt-2 flex flex-wrap gap-1">
-          {order.items.slice(0, 3).map((it, idx) => (
-            <span key={idx} className={`text-xs px-2 py-0.5 rounded-full truncate max-w-[16rem] border text-gray-900 ${it.arrived ? 'bg-green-100 border-green-300' : 'bg-primary/8 border-primary/20'}`}>
-              {it.bookName}{it.sku ? ` · ${t('orders.sku')}: ${it.sku}` : ''} ×{it.quantity}
-            </span>
-          ))}
-          {order.items.length > 3 && (
-            <span className="text-xs text-gray-400 px-1">+{order.items.length - 3}</span>
-          )}
-        </div>
-      )}
-
-      {order.status === 'הגיע חלקית' && (
-        <p className="mt-1.5 text-xs font-medium text-status-partial">
-          {order.items.filter((i) => i.arrived).length} מתוך {order.items.length} ספרים הגיעו
+        <p className="mt-1.5 text-xs text-gray-600 truncate">
+          {order.items.map((it) => it.bookName).join(', ')}
         </p>
       )}
 
-      {!isTerminal && canWrite && (
+      <div className="flex items-center justify-center mt-1.5 text-gray-300 group-hover:text-primary transition-colors">
+        <svg className={`w-4 h-4 transition-transform ${expanded ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </div>
+
+      {expanded && (
+        <div className="mt-2 pt-3 border-t border-gray-100 space-y-3" onClick={(e) => e.stopPropagation()}>
+          <div className="grid grid-cols-2 gap-x-3 gap-y-1.5">
+            <span className="label mb-0">{t('orders.branch')}</span>
+            <span className="text-xs text-gray-700 font-medium">{order.branchId?.name ?? '—'}</span>
+
+            <span className="label mb-0">{t('orders.orderDate')}</span>
+            <span className="text-xs text-gray-700">{formatDate(order.orderDate)}</span>
+
+            <span className="label mb-0">{t('orders.orderedFrom')}</span>
+            <span className="text-xs text-gray-700">{order.orderedFrom || '—'}</span>
+          </div>
+
+          {order.items?.length > 0 && (
+            <div className="space-y-1">
+              {order.items.map((it, idx) => (
+                <div key={idx} className="flex items-center justify-between gap-2 text-xs bg-gray-50 rounded px-2 py-1.5">
+                  <span className="truncate text-gray-800">
+                    {it.bookName}{it.sku ? ` · ${t('orders.sku')}: ${it.sku}` : ''}
+                  </span>
+                  <span className="flex items-center gap-2 flex-shrink-0 text-gray-500">
+                    <span>×{it.quantity}</span>
+                    {it.arrived
+                      ? <span className="text-green-600 font-semibold">{t('orders.arrived')} ✓</span>
+                      : <span className="text-gray-400">—</span>}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {order.status === 'הגיע חלקית' && (
+            <p className="text-xs font-medium text-status-partial">
+              {order.items.filter((i) => i.arrived).length} מתוך {order.items.length} ספרים הגיעו
+            </p>
+          )}
+
+          {order.notes && (
+            <p className="text-xs text-gray-600 whitespace-pre-wrap">{order.notes}</p>
+          )}
+
+          <button
+            onClick={(e) => { e.stopPropagation(); navigate(`/orders/${order._id}`); }}
+            className="text-xs font-semibold text-primary hover:text-primary-dark flex items-center gap-1"
+          >
+            {t('orders.details')}
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+      )}
+
+      {expanded && !isTerminal && canWrite && (
         <div
           className="mt-3 pt-3 border-t border-gray-100 flex items-center gap-2"
           onClick={(e) => e.stopPropagation()}
