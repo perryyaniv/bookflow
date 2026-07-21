@@ -1,10 +1,8 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getOrders } from '../api/orders';
 import { Order } from '../types';
 import AlertPanel from '../components/orders/AlertPanel';
-import Button from '../components/ui/Button';
 import Spinner from '../components/ui/Spinner';
 
 type CardColor = 'gray' | 'green' | 'blue' | 'red';
@@ -28,7 +26,6 @@ function StatCard({ label, value, color = 'gray' }: { label: string; value: numb
 
 export default function Dashboard() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [allOrders, setAllOrders] = useState<Order[]>([]);
   const [notArrived, setNotArrived] = useState<Order[]>([]);
@@ -61,10 +58,6 @@ export default function Dashboard() {
         <StatCard label={t('dashboard.openOrders')} value={open} color="blue" />
         <StatCard label={t('dashboard.notArrived')} value={notArrived.length} color="red" />
         <StatCard label={t('dashboard.notCollected')} value={notCollected.length} color="red" />
-      </div>
-
-      <div className="flex justify-end">
-        <Button size="sm" onClick={() => navigate('/orders/new')}>+ {t('nav.addOrder')}</Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -83,9 +83,6 @@ export default function Orders() {
               {t('orders.tableView')}
             </button>
           </div>
-          <Button onClick={() => navigate('/orders/new')} size="sm">
-            + {t('nav.addOrder')}
-          </Button>
         </div>
       </div>
 

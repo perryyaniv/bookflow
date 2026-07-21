@@ -31,7 +31,6 @@ export default function Header() {
   const navItems = [
     { to: '/', label: t('dashboard.title'), show: true },
     { to: '/orders', label: t('nav.orders'), show: true },
-    { to: '/orders/new', label: t('nav.addOrder'), show: true },
     { to: '/audit-log', label: t('nav.auditLog'), show: isAdmin },
     { to: '/users', label: t('nav.userManagement'), show: isAdmin },
     { to: '/settings', label: t('nav.settings'), show: isAdmin },
