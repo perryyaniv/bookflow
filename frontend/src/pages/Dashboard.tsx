@@ -118,8 +118,9 @@ export default function Dashboard() {
     });
   }, [filteredRows]);
 
-  const total = visibleOrders.length;
-  const alarms = visibleOrders.filter((o) => o.isNotArrived || o.isNotCollected).length;
+  const nonCancelledOrders = useMemo(() => orders.filter((o) => o.status !== 'בוטל'), [orders]);
+  const total = nonCancelledOrders.length;
+  const alarms = nonCancelledOrders.filter((o) => o.isNotArrived || o.isNotCollected).length;
   const totalPages = Math.max(1, Math.ceil(sortedRows.length / PAGE_SIZE));
   const pagedRows = sortedRows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
