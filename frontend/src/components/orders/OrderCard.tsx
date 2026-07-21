@@ -40,6 +40,7 @@ export default function OrderCard({ order, level, onStatusChanged }: Props) {
   const nextStatus = NEXT_STATUS[order.status];
   const isTerminal = order.status === 'נאסף' || order.status === 'בוטל';
   const alertMsg = getAlertText(order, level, t);
+  const isCancelConfirm = confirmStatus === 'בוטל';
 
   const doStatusChange = async (status: OrderStatus) => {
     setChanging(true);
@@ -153,21 +154,34 @@ export default function OrderCard({ order, level, onStatusChanged }: Props) {
       {confirmStatus && (
         <Modal open onClose={() => setConfirmStatus(null)} size="sm">
           <div className="text-center space-y-4" onClick={(e) => e.stopPropagation()}>
-            <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
-              <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto ${isCancelConfirm ? 'bg-red-100' : 'bg-primary/10'}`}>
+              <svg className={`w-6 h-6 ${isCancelConfirm ? 'text-red-600' : 'text-primary'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {isCancelConfirm ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                )}
               </svg>
             </div>
             <div>
-              <p className="font-semibold text-gray-800 text-base">שינוי סטטוס הזמנה</p>
+              <p className={`font-semibold text-base ${isCancelConfirm ? 'text-red-700' : 'text-gray-800'}`}>
+                {isCancelConfirm ? 'ביטול הזמנה' : 'שינוי סטטוס הזמנה'}
+              </p>
               <p className="text-sm text-gray-500 mt-1">
                 להעביר את ההזמנה של <span className="font-medium text-gray-700">"{order.customerName}"</span> לסטטוס{' '}
-                <span className="font-semibold text-primary">"{confirmStatus}"</span>?
+                <span className={`font-semibold ${isCancelConfirm ? 'text-red-600' : 'text-primary'}`}>"{confirmStatus}"</span>?
               </p>
             </div>
             <div className="flex gap-3">
               <Button variant="secondary" className="flex-1" onClick={() => setConfirmStatus(null)}>ביטול</Button>
-              <Button className="flex-1" loading={changing} onClick={() => doStatusChange(confirmStatus)}>אישור</Button>
+              <Button
+                variant={isCancelConfirm ? 'danger' : 'primary'}
+                className="flex-1"
+                loading={changing}
+                onClick={() => doStatusChange(confirmStatus)}
+              >
+                אישור
+              </Button>
             </div>
           </div>
         </Modal>
