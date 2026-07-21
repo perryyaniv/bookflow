@@ -5,7 +5,7 @@ import { Order, OrderStatus, ORDER_STATUSES } from '../../types';
 import { AlertLevel, getAlertText } from '../../utils/alertLevel';
 import { StatusBadge } from '../ui/Badge';
 import { formatDate } from '../../utils/date';
-import { changeOrderStatus } from '../../api/orders';
+import { changeOrderStatus, setItemArrived } from '../../api/orders';
 import { useToast } from '../../contexts/ToastContext';
 import Modal from '../ui/Modal';
 import Button from '../ui/Button';
@@ -53,10 +53,26 @@ export default function OrderCard({ order, level, canWrite, onStatusChanged }: P
   const [confirmStatus, setConfirmStatus] = useState<OrderStatus | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
+  const [updatingIndex, setUpdatingIndex] = useState<number | null>(null);
 
   const isTerminal = order.status === 'נאסף' || order.status === 'בוטל';
+  const itemsLocked = isTerminal || order.status === 'הלקוח עודכן';
   const alertMsg = getAlertText(order, level, t);
   const isCancelConfirm = confirmStatus === 'בוטל';
+
+  const handleToggleArrived = async (e: React.MouseEvent, index: number, current: boolean) => {
+    e.stopPropagation();
+    setUpdatingIndex(index);
+    try {
+      const updated = await setItemArrived(order._id, index, !current);
+      onStatusChanged?.(updated);
+    } catch (err: unknown) {
+      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      showToast(msg ?? 'שגיאה בעדכון הספר', 'error');
+    } finally {
+      setUpdatingIndex(null);
+    }
+  };
 
   const doStatusChange = async (status: OrderStatus) => {
     setChanging(true);
@@ -161,9 +177,19 @@ export default function OrderCard({ order, level, canWrite, onStatusChanged }: P
               </span>
               <span className="flex items-center gap-2 flex-shrink-0 text-gray-500">
                 <span>×{it.quantity}</span>
-                {it.arrived
-                  ? <span className="text-green-600 font-semibold">{t('orders.arrived')} ✓</span>
-                  : <span className="text-amber-600 font-semibold">{t('orders.pending')}</span>}
+                {canWrite && !itemsLocked ? (
+                  <button
+                    onClick={(e) => handleToggleArrived(e, idx, it.arrived)}
+                    disabled={updatingIndex === idx}
+                    className={`font-semibold hover:underline disabled:opacity-50 disabled:hover:no-underline transition-colors ${it.arrived ? 'text-green-600' : 'text-amber-600'}`}
+                  >
+                    {it.arrived ? `${t('orders.arrived')} ✓` : t('orders.pending')}
+                  </button>
+                ) : (
+                  it.arrived
+                    ? <span className="text-green-600 font-semibold">{t('orders.arrived')} ✓</span>
+                    : <span className="text-amber-600 font-semibold">{t('orders.pending')}</span>
+                )}
               </span>
             </div>
           ))}
