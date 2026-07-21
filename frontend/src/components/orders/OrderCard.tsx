@@ -180,17 +180,17 @@ export default function OrderCard({ order, level, canWrite, onStatusChanged }: P
         >
           <button
             onClick={(e) => { e.stopPropagation(); navigate(`/orders/${order._id}`); }}
-            className="flex-1 px-3 py-1.5 rounded-md text-xs font-semibold text-white bg-amber-500 hover:bg-amber-600 transition-colors"
+            className="flex-1 min-w-0 px-3 py-1.5 rounded-md text-xs font-semibold text-white bg-amber-500 hover:bg-amber-600 transition-colors truncate"
           >
             {t('orders.details')}
           </button>
           {!isTerminal && canWrite && nextStatus && (
-            <div className="relative flex-1 flex">
+            <div className="relative flex-1 min-w-0 flex">
               <button
                 onClick={handleAdvanceClick}
                 disabled={changing}
                 title={`שנה סטטוס ל-${nextStatus}`}
-                className="flex-1 flex items-center justify-center px-3 py-1.5 rounded-r-md rounded-l-none text-xs font-semibold transition-colors bg-primary text-white hover:bg-primary-dark"
+                className="flex-1 min-w-0 flex items-center justify-center px-3 py-1.5 rounded-r-md rounded-l-none text-xs font-semibold transition-colors bg-primary text-white hover:bg-primary-dark truncate"
               >
                 {nextStatus}
               </button>
@@ -231,7 +231,7 @@ export default function OrderCard({ order, level, canWrite, onStatusChanged }: P
               onClick={handleCancelClick}
               disabled={changing}
               title="בטל הזמנה"
-              className="flex-1 px-3 py-1.5 rounded-md text-xs font-semibold text-red-500 hover:bg-red-50 transition-colors border border-red-200 hover:border-red-300"
+              className="flex-1 min-w-0 px-3 py-1.5 rounded-md text-xs font-semibold text-red-500 hover:bg-red-50 transition-colors border border-red-200 hover:border-red-300 truncate"
             >
               בוטל
             </button>
