@@ -8,8 +8,15 @@ export default function BottomNav() {
   const location = useLocation();
   const isAdmin = user?.role === 'admin';
 
-  const isActive = (to: string) =>
-    to === '/' ? location.pathname === '/' : location.pathname.startsWith(to);
+  const tabPaths = ['/orders', '/orders/new', '/settings'];
+
+  const isActive = (to: string) => {
+    if (to === '/') return location.pathname === '/';
+    const match = tabPaths
+      .filter((p) => location.pathname === p || location.pathname.startsWith(p + '/'))
+      .sort((a, b) => b.length - a.length)[0];
+    return match === to;
+  };
 
   const tab = (to: string, label: string, icon: React.ReactNode) => {
     const active = isActive(to);
