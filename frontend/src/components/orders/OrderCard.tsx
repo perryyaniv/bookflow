@@ -176,7 +176,7 @@ export default function OrderCard({ order, level, canWrite, onStatusChanged }: P
             <div className="flex gap-3">
               <Button variant="secondary" className="flex-1" onClick={() => setConfirmStatus(null)}>ביטול</Button>
               <Button
-                variant={isCancelConfirm ? 'danger' : 'primary'}
+                variant={isCancelConfirm ? 'dangerSolid' : 'primary'}
                 className="flex-1"
                 loading={changing}
                 onClick={() => doStatusChange(confirmStatus)}
