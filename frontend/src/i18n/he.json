@@ -57,7 +57,8 @@
     "page": "עמוד",
     "of": "מתוך",
     "notArrived": "לא הגיע",
-    "notCollected": "לא נאסף"
+    "notCollected": "לא נאסף",
+    "invalidPhone": "מספר טלפון לא תקין"
   },
   "status": {
     "נוצר": "נוצר",

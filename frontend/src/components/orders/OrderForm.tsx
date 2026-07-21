@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Order, OrderStatus, OrderItem, Branch, ORDER_STATUSES } from '../../types';
 import { getBranches } from '../../api/branches';
 import { getSettings } from '../../api/settings';
+import { isValidIsraeliPhone } from '../../utils/phone';
 import Button from '../ui/Button';
 import DateInput from '../ui/DateInput';
 
@@ -84,7 +85,8 @@ export default function OrderForm({ initial, onSubmit, onCancel, loading, isEdit
     <div><label className="label">{label}</label>{children}</div>
   );
 
-  const canSubmit = !!form.customerName && !!form.customerPhone && !!form.branchId && !!form.orderedFrom && form.items.some((it) => it.bookName.trim());
+  const phoneValid = isValidIsraeliPhone(form.customerPhone);
+  const canSubmit = !!form.customerName && phoneValid && !!form.branchId && !!form.orderedFrom && form.items.some((it) => it.bookName.trim());
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -93,7 +95,12 @@ export default function OrderForm({ initial, onSubmit, onCancel, loading, isEdit
           <input required value={form.customerName} onChange={(e) => set('customerName', e.target.value)} className={inputCls} />
         ))}
         {field(t('orders.customerPhone') + ' *', (
-          <input required value={form.customerPhone} onChange={(e) => set('customerPhone', e.target.value)} className={inputCls} type="tel" />
+          <>
+            <input required value={form.customerPhone} onChange={(e) => set('customerPhone', e.target.value)} className={inputCls} type="tel" />
+            {form.customerPhone && !phoneValid && (
+              <p className="text-xs text-red-500 mt-1">{t('orders.invalidPhone')}</p>
+            )}
+          </>
         ))}
         {field(t('orders.branch') + ' *', (
           <select required value={form.branchId} onChange={(e) => set('branchId', e.target.value)} className={inputCls}>
