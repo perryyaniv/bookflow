@@ -4,6 +4,7 @@ import { Order, OrderStatus, OrderItem, Branch, ORDER_STATUSES } from '../../typ
 import { getBranches } from '../../api/branches';
 import { getSettings } from '../../api/settings';
 import { isValidIsraeliPhone } from '../../utils/phone';
+import { supportsPartialArrival } from '../../utils/orderRules';
 import Button from '../ui/Button';
 import DateInput from '../ui/DateInput';
 
@@ -73,6 +74,8 @@ export default function OrderForm({ initial, onSubmit, onCancel, loading, isEdit
   const phoneValid = isValidIsraeliPhone(form.customerPhone);
   const step1Valid = !!form.customerName && phoneValid && !!form.branchId && !!form.orderedFrom;
   const canSubmit = step1Valid && form.items.some((it) => it.bookName.trim());
+  const realItemCount = form.items.filter((it) => it.bookName.trim()).length;
+  const statusOptions = ORDER_STATUSES.filter((s) => s !== 'הגיע חלקית' || supportsPartialArrival(realItemCount));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -135,7 +138,7 @@ export default function OrderForm({ initial, onSubmit, onCancel, loading, isEdit
           <div>
             <label className="label">{t('orders.status')}</label>
             <select value={form.status} onChange={(e) => set('status', e.target.value as OrderStatus)} className={inputCls}>
-              {ORDER_STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+              {statusOptions.map((s) => <option key={s} value={s}>{s}</option>)}
             </select>
           </div>
         )}

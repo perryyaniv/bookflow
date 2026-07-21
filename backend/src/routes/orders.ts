@@ -10,6 +10,10 @@ import { asyncHandler } from '../utils/asyncHandler';
 const ARRIVAL_ADVANCEABLE: OrderStatus[] = ['נוצר', 'הוזמן', 'הגיע חלקית', 'הגיע'];
 const ARRIVED_OR_LATER: OrderStatus[] = ['הגיע', 'הלקוח עודכן', 'נאסף'];
 
+function supportsPartialArrival(itemCount: number): boolean {
+  return itemCount > 1;
+}
+
 function statusFromItemArrivals(items: IOrderItem[], currentStatus: OrderStatus): OrderStatus {
   if (!ARRIVAL_ADVANCEABLE.includes(currentStatus)) return currentStatus;
   const allArrived = items.length > 0 && items.every((i) => i.arrived);
@@ -152,6 +156,12 @@ router.put('/:id', requireWriteAccess, asyncHandler<AuthRequest>(async (req, res
 
   const update: Record<string, unknown> = { ...req.body, updatedBy: req.user!.userId };
   const newStatus = update.status as OrderStatus | undefined;
+  const effectiveItems = (update.items as IOrderItem[] | undefined) ?? existing.items;
+
+  if (newStatus === 'הגיע חלקית' && !supportsPartialArrival(effectiveItems.length)) {
+    res.status(400).json({ message: 'סטטוס "הגיע חלקית" רלוונטי רק להזמנה עם יותר מספר אחד' });
+    return;
+  }
 
   if (newStatus && newStatus !== existing.status) {
     if (newStatus === 'הוזמן' && !existing.orderedAt) update.orderedAt = new Date();
@@ -161,8 +171,7 @@ router.put('/:id', requireWriteAccess, asyncHandler<AuthRequest>(async (req, res
 
   const effectiveStatus = (newStatus ?? existing.status) as OrderStatus;
   if (ARRIVED_OR_LATER.includes(effectiveStatus)) {
-    const items = (update.items as IOrderItem[] | undefined) ?? existing.items;
-    update.items = items.map((it) => ({ ...it, arrived: true }));
+    update.items = effectiveItems.map((it) => ({ ...it, arrived: true }));
   }
 
   const io: Server = req.app.get('io');
@@ -205,6 +214,11 @@ router.patch('/:id/status', requireWriteAccess, asyncHandler<AuthRequest>(async 
     return;
   }
 
+  if (status === 'הגיע חלקית' && !supportsPartialArrival(existing.items.length)) {
+    res.status(400).json({ message: 'סטטוס "הגיע חלקית" רלוונטי רק להזמנה עם יותר מספר אחד' });
+    return;
+  }
+
   const oldStatus = existing.status;
   existing.status = status;
   existing.updatedBy = req.user!.userId as never;
@@ -244,6 +258,11 @@ router.patch('/:id/items/:index/arrived', requireWriteAccess, asyncHandler<AuthR
   const item = existing.items[index];
   if (!item) {
     res.status(400).json({ message: 'Invalid item index' });
+    return;
+  }
+
+  if (!supportsPartialArrival(existing.items.length)) {
+    res.status(400).json({ message: 'בהזמנה עם ספר אחד יש לשנות את סטטוס ההזמנה כולה' });
     return;
   }
 

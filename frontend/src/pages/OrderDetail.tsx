@@ -17,6 +17,7 @@ import { io } from 'socket.io-client';
 import { formatDate, formatDateTime } from '../utils/date';
 import { AlertLevel, getAlertLevel, getAlertText } from '../utils/alertLevel';
 import { hasWriteAccess } from '../utils/roles';
+import { supportsPartialArrival } from '../utils/orderRules';
 
 const ALERT_ICON_COLOR: Record<AlertLevel, string> = {
   red: 'text-red-600',
@@ -226,7 +227,7 @@ export default function OrderDetail() {
                             <input
                               type="checkbox"
                               checked={it.arrived}
-                              disabled={order.status === 'הלקוח עודכן' || order.status === 'נאסף' || order.status === 'בוטל' || !canWrite}
+                              disabled={order.status === 'הלקוח עודכן' || order.status === 'נאסף' || order.status === 'בוטל' || !canWrite || !supportsPartialArrival(order.items.length)}
                               onChange={(e) => handleToggleArrived(idx, e.target.checked)}
                               className="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary disabled:opacity-50"
                             />

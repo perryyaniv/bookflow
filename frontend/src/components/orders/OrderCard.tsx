@@ -6,6 +6,7 @@ import { AlertLevel, getAlertText } from '../../utils/alertLevel';
 import { StatusBadge } from '../ui/Badge';
 import { formatDate } from '../../utils/date';
 import { changeOrderStatus, setItemArrived } from '../../api/orders';
+import { supportsPartialArrival } from '../../utils/orderRules';
 import { useToast } from '../../contexts/ToastContext';
 import Modal from '../ui/Modal';
 import Button from '../ui/Button';
@@ -23,7 +24,7 @@ const ALERT_TEXT_COLOR: Record<AlertLevel, string> = {
   green: '',
 };
 
-const JUMPABLE_STATUSES = ORDER_STATUSES.filter((s) => s !== 'בוטל');
+const ALL_JUMPABLE_STATUSES = ORDER_STATUSES.filter((s) => s !== 'בוטל');
 
 const STATUS_ACCENT_BORDER: Record<OrderStatus, string> = {
   'נוצר': 'border-r-status-created',
@@ -57,6 +58,8 @@ export default function OrderCard({ order, level, canWrite, onStatusChanged }: P
 
   const isTerminal = order.status === 'נאסף' || order.status === 'בוטל';
   const itemsLocked = isTerminal || order.status === 'הלקוח עודכן';
+  const canBePartial = supportsPartialArrival(order.items?.length ?? 0);
+  const jumpableStatuses = canBePartial ? ALL_JUMPABLE_STATUSES : ALL_JUMPABLE_STATUSES.filter((s) => s !== 'הגיע חלקית');
   const alertMsg = getAlertText(order, level, t);
   const isCancelConfirm = confirmStatus === 'בוטל';
 
@@ -140,7 +143,7 @@ export default function OrderCard({ order, level, canWrite, onStatusChanged }: P
               <>
                 <div className="fixed inset-0 z-10" onClick={(e) => { e.stopPropagation(); setMenuOpen(false); }} />
                 <div className="absolute top-full mt-1 left-0 z-20 bg-white border border-gray-200 rounded-md shadow-lg py-1 w-40 max-h-56 overflow-y-auto">
-                  {JUMPABLE_STATUSES.map((s) => (
+                  {jumpableStatuses.map((s) => (
                     <button
                       key={s}
                       onClick={(e) => handleJumpTo(e, s)}
@@ -177,7 +180,7 @@ export default function OrderCard({ order, level, canWrite, onStatusChanged }: P
               </span>
               <span className="flex items-center gap-2 flex-shrink-0 text-gray-500">
                 <span>×{it.quantity}</span>
-                {canWrite && !itemsLocked ? (
+                {canWrite && !itemsLocked && canBePartial ? (
                   <button
                     onClick={(e) => handleToggleArrived(e, idx, it.arrived)}
                     disabled={updatingIndex === idx}
