@@ -1,11 +1,12 @@
-import { Router, Response } from 'express';
+import { Router } from 'express';
 import { authenticate, requireRole, AuthRequest } from '../middleware/auth';
 import AuditLogEntry from '../models/AuditLogEntry';
+import { asyncHandler } from '../utils/asyncHandler';
 
 const router = Router();
 router.use(authenticate, requireRole('admin'));
 
-router.get('/', async (req: AuthRequest, res: Response) => {
+router.get('/', asyncHandler<AuthRequest>(async (req, res) => {
   const { orderId, page = '1', limit = '50', search } = req.query as Record<string, string>;
   const query: Record<string, unknown> = {};
   if (orderId) query.orderId = orderId;
@@ -27,6 +28,6 @@ router.get('/', async (req: AuthRequest, res: Response) => {
     .lean();
 
   res.json({ data, total, page: pageNum, totalPages: Math.ceil(total / limitNum) });
-});
+}));
 
 export default router;

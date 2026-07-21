@@ -18,5 +18,8 @@ export const updateOrder = (id: string, data: Partial<Order>) =>
 export const changeOrderStatus = (id: string, status: string) =>
   client.patch<Order>(`/orders/${id}/status`, { status }).then((r) => r.data);
 
+export const setItemArrived = (id: string, itemIndex: number, arrived: boolean) =>
+  client.patch<Order>(`/orders/${id}/items/${itemIndex}/arrived`, { arrived }).then((r) => r.data);
+
 export const deleteOrder = (id: string) =>
   client.delete(`/orders/${id}`).then((r) => r.data);

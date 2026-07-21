@@ -5,7 +5,7 @@ export function daysSince(date: Date): number {
 }
 
 export function isNotArrived(order: Pick<IOrder, 'status' | 'orderedAt'>, thresholdDays: number): boolean {
-  if (order.status !== 'הוזמן' || !order.orderedAt) return false;
+  if (!['הוזמן', 'הגיע חלקית'].includes(order.status) || !order.orderedAt) return false;
   return daysSince(order.orderedAt) >= thresholdDays;
 }
 

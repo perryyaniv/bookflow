@@ -17,6 +17,7 @@ interface Props {
 const NEXT_STATUS: Partial<Record<OrderStatus, OrderStatus>> = {
   'נוצר': 'הוזמן',
   'הוזמן': 'הגיע',
+  'הגיע חלקית': 'הגיע',
   'הגיע': 'הלקוח עודכן',
   'הלקוח עודכן': 'נאסף',
 };
@@ -88,7 +89,7 @@ export default function OrderCard({ order, onStatusChanged }: Props) {
       {order.items?.length > 0 && (
         <div className="mt-2 flex flex-wrap gap-1">
           {order.items.slice(0, 3).map((it, idx) => (
-            <span key={idx} className="text-xs bg-primary/8 text-primary border border-primary/20 px-2 py-0.5 rounded-full truncate max-w-[10rem]">
+            <span key={idx} className={`text-xs px-2 py-0.5 rounded-full truncate max-w-[10rem] border ${it.arrived ? 'bg-status-partial/10 text-status-partial border-status-partial/30' : 'bg-primary/8 text-primary border-primary/20'}`}>
               {it.bookName} ×{it.quantity}
             </span>
           ))}
@@ -96,6 +97,12 @@ export default function OrderCard({ order, onStatusChanged }: Props) {
             <span className="text-xs text-gray-400 px-1">+{order.items.length - 3}</span>
           )}
         </div>
+      )}
+
+      {order.status === 'הגיע חלקית' && (
+        <p className="mt-1.5 text-xs font-medium text-status-partial">
+          {order.items.filter((i) => i.arrived).length} מתוך {order.items.length} ספרים הגיעו
+        </p>
       )}
 
       {(order.isNotArrived || order.isNotCollected) && (

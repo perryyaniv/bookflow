@@ -3,6 +3,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 export type OrderStatus =
   | 'נוצר'
   | 'הוזמן'
+  | 'הגיע חלקית'
   | 'הגיע'
   | 'הלקוח עודכן'
   | 'נאסף'
@@ -11,6 +12,7 @@ export type OrderStatus =
 export const ORDER_STATUSES: OrderStatus[] = [
   'נוצר',
   'הוזמן',
+  'הגיע חלקית',
   'הגיע',
   'הלקוח עודכן',
   'נאסף',
@@ -21,6 +23,7 @@ export interface IOrderItem {
   bookName: string;
   sku?: string;
   quantity: number;
+  arrived: boolean;
 }
 
 export interface IOrder extends Document {
@@ -46,6 +49,7 @@ const OrderItemSchema = new Schema<IOrderItem>(
     bookName: { type: String, required: true, trim: true },
     sku: { type: String, trim: true, default: '' },
     quantity: { type: Number, required: true, min: 1, default: 1 },
+    arrived: { type: Boolean, default: false },
   },
   { _id: false }
 );

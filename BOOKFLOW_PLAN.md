@@ -30,10 +30,17 @@ The app will be built with a stack closely aligned to the reference project in C
 ### Status lifecycle
 - Created
 - Ordered
+- Partially Arrived (auto-derived from per-book arrival tracking; not manually selectable)
 - Arrived
 - Customer Notified
 - Collected
 - Cancelled
+
+### Partial arrival
+- Each book line has its own "arrived" flag, toggled from the order detail page
+- The order's overall status is derived automatically: none arrived → unchanged, some arrived → Partially Arrived, all arrived → Arrived
+- Manually advancing an order to "Arrived" marks every line as arrived, keeping the two in sync
+- Once an order is past the arrival stage (Customer Notified, Collected, Cancelled), toggling line items no longer changes the order status
 
 ### Alerting rules
 - “Not Arrived” is based on the Ordered date

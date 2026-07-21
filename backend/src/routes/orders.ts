@@ -1,10 +1,22 @@
-import { Router, Response } from 'express';
+import { Router } from 'express';
 import { Server } from 'socket.io';
-import Order, { ORDER_STATUSES, OrderStatus } from '../models/Order';
+import Order, { IOrderItem, ORDER_STATUSES, OrderStatus } from '../models/Order';
 import AppSettings from '../models/AppSettings';
 import { authenticate, AuthRequest } from '../middleware/auth';
 import { logAudit } from '../utils/auditLogger';
 import { isNotArrived, isNotCollected } from '../utils/alerts';
+import { asyncHandler } from '../utils/asyncHandler';
+
+const ARRIVAL_ADVANCEABLE: OrderStatus[] = ['נוצר', 'הוזמן', 'הגיע חלקית', 'הגיע'];
+
+function statusFromItemArrivals(items: IOrderItem[], currentStatus: OrderStatus): OrderStatus {
+  if (!ARRIVAL_ADVANCEABLE.includes(currentStatus)) return currentStatus;
+  const allArrived = items.length > 0 && items.every((i) => i.arrived);
+  const someArrived = items.some((i) => i.arrived);
+  if (allArrived) return 'הגיע';
+  if (someArrived) return 'הגיע חלקית';
+  return currentStatus === 'הגיע' || currentStatus === 'הגיע חלקית' ? 'הוזמן' : currentStatus;
+}
 
 const router = Router();
 router.use(authenticate);
@@ -30,7 +42,7 @@ function withAlerts<T extends { status: OrderStatus; orderedAt?: Date | null; cu
   };
 }
 
-router.get('/', async (req: AuthRequest, res: Response) => {
+router.get('/', asyncHandler<AuthRequest>(async (req, res) => {
   const {
     branchId, status, isPaid, search,
     page = '1', limit = '25', sortBy = 'createdAt', sortDir = 'desc', alert,
@@ -82,9 +94,9 @@ router.get('/', async (req: AuthRequest, res: Response) => {
 
   const result = orders.map((o) => withAlerts(o, thresholds));
   res.json({ data: result, total, page: pageNum, totalPages: Math.ceil(total / limitNum) });
-});
+}));
 
-router.get('/:id', async (req: AuthRequest, res: Response) => {
+router.get('/:id', asyncHandler<AuthRequest>(async (req, res) => {
   const order = await Order.findById(req.params.id).populate('branchId', 'name').lean();
   if (!order) {
     res.status(404).json({ message: 'Not found' });
@@ -92,17 +104,17 @@ router.get('/:id', async (req: AuthRequest, res: Response) => {
   }
   const thresholds = await getThresholds();
   res.json(withAlerts(order, thresholds));
-});
+}));
 
-router.post('/', async (req: AuthRequest, res: Response) => {
+router.post('/', asyncHandler<AuthRequest>(async (req, res) => {
   const payload = { ...req.body, createdBy: req.user!.userId, updatedBy: req.user!.userId };
   const order = await Order.create(payload);
   const populated = await Order.findById(order._id).populate('branchId', 'name').lean();
   await logAudit({ userId: req.user!.userId, userName: req.user!.name, orderId: order._id.toString(), action: 'יצר הזמנה' });
   res.status(201).json(populated);
-});
+}));
 
-router.put('/:id', async (req: AuthRequest, res: Response) => {
+router.put('/:id', asyncHandler<AuthRequest>(async (req, res) => {
   const existing = await Order.findById(req.params.id).lean();
   if (!existing) {
     res.status(404).json({ message: 'Not found' });
@@ -142,9 +154,9 @@ router.put('/:id', async (req: AuthRequest, res: Response) => {
   const result = withAlerts(updated!, thresholds);
   io.to(`branch:${existing.branchId}`).emit('order-updated', result);
   res.json(result);
-});
+}));
 
-router.patch('/:id/status', async (req: AuthRequest, res: Response) => {
+router.patch('/:id/status', asyncHandler<AuthRequest>(async (req, res) => {
   const { status } = req.body as { status: OrderStatus };
   if (!ORDER_STATUSES.includes(status)) {
     res.status(400).json({ message: 'Invalid status' });
@@ -160,6 +172,7 @@ router.patch('/:id/status', async (req: AuthRequest, res: Response) => {
   existing.status = status;
   existing.updatedBy = req.user!.userId as never;
   if (status === 'הוזמן' && !existing.orderedAt) existing.orderedAt = new Date();
+  if (status === 'הגיע') existing.items.forEach((i) => { i.arrived = true; });
   if (status === 'הלקוח עודכן' && !existing.customerNotifiedAt) existing.customerNotifiedAt = new Date();
   await existing.save();
 
@@ -179,9 +192,58 @@ router.patch('/:id/status', async (req: AuthRequest, res: Response) => {
   const result = withAlerts(populated!, thresholds);
   io.to(`branch:${existing.branchId}`).emit('order-updated', result);
   res.json(result);
-});
+}));
 
-router.delete('/:id', async (req: AuthRequest, res: Response) => {
+router.patch('/:id/items/:index/arrived', asyncHandler<AuthRequest>(async (req, res) => {
+  const index = parseInt(req.params.index, 10);
+  const { arrived } = req.body as { arrived: boolean };
+
+  const existing = await Order.findById(req.params.id);
+  if (!existing) {
+    res.status(404).json({ message: 'Not found' });
+    return;
+  }
+  const item = existing.items[index];
+  if (!item) {
+    res.status(400).json({ message: 'Invalid item index' });
+    return;
+  }
+
+  item.arrived = !!arrived;
+  const oldStatus = existing.status;
+  const newStatus = statusFromItemArrivals(existing.items, existing.status);
+  existing.status = newStatus;
+  existing.updatedBy = req.user!.userId as never;
+  if ((newStatus === 'הגיע' || newStatus === 'הגיע חלקית') && !existing.orderedAt) existing.orderedAt = new Date();
+  await existing.save();
+
+  await logAudit({
+    userId: req.user!.userId,
+    userName: req.user!.name,
+    orderId: existing._id.toString(),
+    action: arrived ? `סימן ספר כהגיע: ${item.bookName}` : `ביטל סימון הגעה: ${item.bookName}`,
+  });
+  if (newStatus !== oldStatus) {
+    await logAudit({
+      userId: req.user!.userId,
+      userName: req.user!.name,
+      orderId: existing._id.toString(),
+      action: 'שינה סטטוס',
+      fieldChanged: 'status',
+      oldValue: oldStatus,
+      newValue: newStatus,
+    });
+  }
+
+  const populated = await Order.findById(existing._id).populate('branchId', 'name').lean();
+  const io: Server = req.app.get('io');
+  const thresholds = await getThresholds();
+  const result = withAlerts(populated!, thresholds);
+  io.to(`branch:${existing.branchId}`).emit('order-updated', result);
+  res.json(result);
+}));
+
+router.delete('/:id', asyncHandler<AuthRequest>(async (req, res) => {
   const order = await Order.findById(req.params.id);
   if (!order) {
     res.status(404).json({ message: 'Not found' });
@@ -190,6 +252,6 @@ router.delete('/:id', async (req: AuthRequest, res: Response) => {
   await order.deleteOne();
   await logAudit({ userId: req.user!.userId, userName: req.user!.name, action: 'מחק הזמנה' });
   res.json({ message: 'Deleted' });
-});
+}));
 
 export default router;

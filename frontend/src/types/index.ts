@@ -1,8 +1,8 @@
 export type UserRole = 'admin' | 'clerk';
 
-export type OrderStatus = 'נוצר' | 'הוזמן' | 'הגיע' | 'הלקוח עודכן' | 'נאסף' | 'בוטל';
+export type OrderStatus = 'נוצר' | 'הוזמן' | 'הגיע חלקית' | 'הגיע' | 'הלקוח עודכן' | 'נאסף' | 'בוטל';
 
-export const ORDER_STATUSES: OrderStatus[] = ['נוצר', 'הוזמן', 'הגיע', 'הלקוח עודכן', 'נאסף', 'בוטל'];
+export const ORDER_STATUSES: OrderStatus[] = ['נוצר', 'הוזמן', 'הגיע חלקית', 'הגיע', 'הלקוח עודכן', 'נאסף', 'בוטל'];
 
 export interface Branch {
   _id: string;
@@ -25,6 +25,7 @@ export interface OrderItem {
   bookName: string;
   sku?: string;
   quantity: number;
+  arrived: boolean;
 }
 
 export interface Order {

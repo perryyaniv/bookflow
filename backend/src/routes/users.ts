@@ -1,17 +1,18 @@
-import { Router, Response } from 'express';
+import { Router } from 'express';
 import User from '../models/User';
 import { authenticate, requireRole, AuthRequest } from '../middleware/auth';
 import { logAudit } from '../utils/auditLogger';
+import { asyncHandler } from '../utils/asyncHandler';
 
 const router = Router();
 router.use(authenticate, requireRole('admin'));
 
-router.get('/', async (_req: AuthRequest, res: Response) => {
+router.get('/', asyncHandler<AuthRequest>(async (_req, res) => {
   const users = await User.find().select('-password').sort({ createdAt: -1 });
   res.json(users);
-});
+}));
 
-router.post('/', async (req: AuthRequest, res: Response) => {
+router.post('/', asyncHandler<AuthRequest>(async (req, res) => {
   const { name, username, password, role, branchId } = req.body;
   if (!name || !username || !password || !role) {
     res.status(400).json({ message: 'name, username, password, role required' });
@@ -33,9 +34,9 @@ router.post('/', async (req: AuthRequest, res: Response) => {
     active: user.active,
     forcePasswordChange: user.forcePasswordChange,
   });
-});
+}));
 
-router.put('/:id', async (req: AuthRequest, res: Response) => {
+router.put('/:id', asyncHandler<AuthRequest>(async (req, res) => {
   const { role, active, branchId, name } = req.body;
   const update: Record<string, unknown> = {};
   if (role !== undefined) update.role = role;
@@ -50,9 +51,9 @@ router.put('/:id', async (req: AuthRequest, res: Response) => {
   }
   await logAudit({ userId: req.user!.userId, userName: req.user!.name, action: `עדכן משתמש ${user.name}` });
   res.json(user);
-});
+}));
 
-router.post('/:id/reset-password', async (req: AuthRequest, res: Response) => {
+router.post('/:id/reset-password', asyncHandler<AuthRequest>(async (req, res) => {
   const { tempPassword } = req.body;
   if (!tempPassword) {
     res.status(400).json({ message: 'tempPassword required' });
@@ -68,6 +69,6 @@ router.post('/:id/reset-password', async (req: AuthRequest, res: Response) => {
   await user.save();
   await logAudit({ userId: req.user!.userId, userName: req.user!.name, action: `אפס סיסמה למשתמש ${user.name}` });
   res.json({ message: 'Password reset' });
-});
+}));
 
 export default router;

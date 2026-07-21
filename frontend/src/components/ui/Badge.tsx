@@ -3,6 +3,7 @@ import { OrderStatus } from '../../types';
 const statusConfig: Record<OrderStatus, { dot: string }> = {
   'נוצר': { dot: 'bg-status-created' },
   'הוזמן': { dot: 'bg-status-ordered' },
+  'הגיע חלקית': { dot: 'bg-status-partial' },
   'הגיע': { dot: 'bg-status-arrived' },
   'הלקוח עודכן': { dot: 'bg-status-notified' },
   'נאסף': { dot: 'bg-status-collected' },

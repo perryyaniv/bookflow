@@ -36,7 +36,7 @@ function toForm(order?: Partial<Order>): FormData {
     isPaid: order?.isPaid ?? false,
     status: order?.status ?? 'נוצר',
     notes: order?.notes ?? '',
-    items: order?.items?.length ? order.items : [{ bookName: '', sku: '', quantity: 1 }],
+    items: order?.items?.length ? order.items : [{ bookName: '', sku: '', quantity: 1, arrived: false }],
   };
 }
 
@@ -63,7 +63,7 @@ export default function OrderForm({ initial, onSubmit, onCancel, loading, isEdit
     }));
 
   const addItem = () =>
-    setForm((f) => ({ ...f, items: [...f.items, { bookName: '', sku: '', quantity: 1 }] }));
+    setForm((f) => ({ ...f, items: [...f.items, { bookName: '', sku: '', quantity: 1, arrived: false }] }));
 
   const removeItem = (index: number) =>
     setForm((f) => ({ ...f, items: f.items.filter((_, i) => i !== index) }));

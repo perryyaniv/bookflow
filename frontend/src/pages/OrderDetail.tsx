@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { getOrder, updateOrder, deleteOrder } from '../api/orders';
+import { getOrder, updateOrder, deleteOrder, setItemArrived } from '../api/orders';
 import { Order } from '../types';
 import { StatusBadge } from '../components/ui/Badge';
 import OrderForm from '../components/orders/OrderForm';
@@ -84,6 +84,12 @@ export default function OrderDetail() {
     if (!id) return;
     await deleteOrder(id);
     navigate('/orders');
+  };
+
+  const handleToggleArrived = async (index: number, arrived: boolean) => {
+    if (!id) return;
+    const updated = await setItemArrived(id, index, arrived);
+    setOrder(updated);
   };
 
   if (loading) return <Spinner />;
@@ -173,14 +179,24 @@ export default function OrderDetail() {
                         <th className="px-3 py-2 text-right text-xs font-semibold text-gray-500">{t('orders.bookName')}</th>
                         <th className="px-3 py-2 text-right text-xs font-semibold text-gray-500">{t('orders.sku')}</th>
                         <th className="px-3 py-2 text-right text-xs font-semibold text-gray-500">{t('orders.quantity')}</th>
+                        <th className="px-3 py-2 text-right text-xs font-semibold text-gray-500">{t('orders.arrived')}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-50">
                       {order.items.map((it, idx) => (
-                        <tr key={idx}>
+                        <tr key={idx} className={it.arrived ? 'bg-green-50/50' : undefined}>
                           <td className="px-3 py-2 text-gray-800">{it.bookName}</td>
                           <td className="px-3 py-2 text-gray-500">{it.sku || '—'}</td>
                           <td className="px-3 py-2 text-gray-800">{it.quantity}</td>
+                          <td className="px-3 py-2">
+                            <input
+                              type="checkbox"
+                              checked={it.arrived}
+                              disabled={order.status === 'נאסף' || order.status === 'בוטל'}
+                              onChange={(e) => handleToggleArrived(idx, e.target.checked)}
+                              className="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary disabled:opacity-50"
+                            />
+                          </td>
                         </tr>
                       ))}
                     </tbody>

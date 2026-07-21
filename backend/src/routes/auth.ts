@@ -2,10 +2,11 @@ import { Router, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import User from '../models/User';
 import { authenticate, AuthRequest } from '../middleware/auth';
+import { asyncHandler } from '../utils/asyncHandler';
 
 const router = Router();
 
-router.post('/login', async (req: Request, res: Response) => {
+router.post('/login', asyncHandler<Request>(async (req, res: Response) => {
   const { username, password } = req.body;
   if (!username || !password) {
     res.status(400).json({ message: 'Username and password required' });
@@ -32,9 +33,9 @@ router.post('/login', async (req: Request, res: Response) => {
       forcePasswordChange: user.forcePasswordChange,
     },
   });
-});
+}));
 
-router.post('/change-password', authenticate, async (req: AuthRequest, res: Response) => {
+router.post('/change-password', authenticate, asyncHandler<AuthRequest>(async (req, res) => {
   const { newPassword } = req.body;
   if (!newPassword || newPassword.length < 6) {
     res.status(400).json({ message: 'Password must be at least 6 characters' });
@@ -49,15 +50,15 @@ router.post('/change-password', authenticate, async (req: AuthRequest, res: Resp
   user.forcePasswordChange = false;
   await user.save();
   res.json({ message: 'Password changed successfully' });
-});
+}));
 
-router.get('/me', authenticate, async (req: AuthRequest, res: Response) => {
+router.get('/me', authenticate, asyncHandler<AuthRequest>(async (req, res) => {
   const user = await User.findById(req.user!.userId).select('-password');
   if (!user) {
     res.status(404).json({ message: 'User not found' });
     return;
   }
   res.json(user);
-});
+}));
 
 export default router;

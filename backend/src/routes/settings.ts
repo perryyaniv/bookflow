@@ -1,6 +1,7 @@
-import { Router, Response } from 'express';
+import { Router } from 'express';
 import AppSettings from '../models/AppSettings';
 import { authenticate, requireRole, AuthRequest } from '../middleware/auth';
+import { asyncHandler } from '../utils/asyncHandler';
 
 const router = Router();
 router.use(authenticate);
@@ -11,12 +12,12 @@ async function getOrCreateSettings() {
   return settings;
 }
 
-router.get('/', async (_req: AuthRequest, res: Response) => {
+router.get('/', asyncHandler<AuthRequest>(async (_req, res) => {
   const settings = await getOrCreateSettings();
   res.json(settings);
-});
+}));
 
-router.put('/', requireRole('admin'), async (req: AuthRequest, res: Response) => {
+router.put('/', requireRole('admin'), asyncHandler<AuthRequest>(async (req, res) => {
   const settings = await getOrCreateSettings();
   const { orderSourceOptions, notArrivedThresholdDays, notCollectedThresholdDays } = req.body;
   if (orderSourceOptions !== undefined) settings.orderSourceOptions = orderSourceOptions;
@@ -24,6 +25,6 @@ router.put('/', requireRole('admin'), async (req: AuthRequest, res: Response) =>
   if (notCollectedThresholdDays !== undefined) settings.notCollectedThresholdDays = notCollectedThresholdDays;
   await settings.save();
   res.json(settings);
-});
+}));
 
 export default router;

@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import http from 'http';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -32,6 +32,15 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/branches', branchRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/audit-log', auditLogRoutes);
+
+app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
+  console.error(err);
+  if (err.name === 'ValidationError' || err.name === 'CastError') {
+    res.status(400).json({ message: err.message });
+    return;
+  }
+  res.status(500).json({ message: 'שגיאת שרת' });
+});
 
 io.on('connection', (socket) => {
   socket.on('join-branch', (branchId: string) => socket.join(`branch:${branchId}`));
