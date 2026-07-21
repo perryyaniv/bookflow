@@ -76,7 +76,7 @@ export default function OrderForm({ initial, onSubmit, onCancel, loading, isEdit
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isEdit && step === 1) {
+    if (step === 1) {
       setStep(2);
       return;
     }
@@ -96,15 +96,13 @@ export default function OrderForm({ initial, onSubmit, onCancel, loading, isEdit
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {!isEdit && (
-        <div className="flex items-center gap-2 text-xs font-semibold">
-          <span className={step === 1 ? 'text-primary' : 'text-gray-400'}>1. {t('orders.details')}</span>
-          <span className="text-gray-300">›</span>
-          <span className={step === 2 ? 'text-primary' : 'text-gray-400'}>2. {t('orders.items')}</span>
-        </div>
-      )}
+      <div className="flex items-center gap-2 text-xs font-semibold">
+        <span className={step === 1 ? 'text-primary' : 'text-gray-400'}>1. {t('orders.details')}</span>
+        <span className="text-gray-300">›</span>
+        <span className={step === 2 ? 'text-primary' : 'text-gray-400'}>2. {t('orders.items')}</span>
+      </div>
 
-      {(isEdit || step === 1) && (
+      {step === 1 && (
       <>
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
         {field(t('orders.customerName') + ' *', (
@@ -156,7 +154,7 @@ export default function OrderForm({ initial, onSubmit, onCancel, loading, isEdit
       </>
       )}
 
-      {(isEdit || step === 2) && (
+      {step === 2 && (
       <>
       <div>
         <label className="label">{t('orders.items')}</label>
@@ -229,11 +227,11 @@ export default function OrderForm({ initial, onSubmit, onCancel, loading, isEdit
       )}
 
       <div className="flex gap-3 justify-end pt-2 border-t border-gray-100">
-        {!isEdit && step === 2 && (
+        {step === 2 && (
           <Button type="button" variant="secondary" onClick={() => setStep(1)}>{t('common.back')}</Button>
         )}
         <Button type="button" variant="secondary" onClick={onCancel}>{t('common.cancel')}</Button>
-        {!isEdit && step === 1 ? (
+        {step === 1 ? (
           <Button type="submit" disabled={!step1Valid}>{t('common.next')}</Button>
         ) : (
           <Button type="submit" loading={loading} disabled={!canSubmit}>{t('common.save')}</Button>
