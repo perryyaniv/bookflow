@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { Server } from 'socket.io';
 import Order, { IOrderItem, ORDER_STATUSES, OrderStatus } from '../models/Order';
 import AppSettings from '../models/AppSettings';
-import { authenticate, AuthRequest } from '../middleware/auth';
+import { authenticate, requireRole, AuthRequest } from '../middleware/auth';
 import { logAudit } from '../utils/auditLogger';
 import { isNotArrived, isNotCollected } from '../utils/alerts';
 import { asyncHandler } from '../utils/asyncHandler';
@@ -20,6 +20,7 @@ function statusFromItemArrivals(items: IOrderItem[], currentStatus: OrderStatus)
 
 const router = Router();
 router.use(authenticate);
+const requireWriteAccess = requireRole('admin', 'editor');
 
 const TRACKED_FIELDS = ['status', 'isPaid', 'orderedFrom', 'customerName', 'customerPhone', 'orderDate'];
 
@@ -114,7 +115,7 @@ router.get('/:id', asyncHandler<AuthRequest>(async (req, res) => {
   res.json(withAlerts(order, thresholds));
 }));
 
-router.post('/', asyncHandler<AuthRequest>(async (req, res) => {
+router.post('/', requireWriteAccess, asyncHandler<AuthRequest>(async (req, res) => {
   const payload = { ...req.body, createdBy: req.user!.userId, updatedBy: req.user!.userId };
   const order = await Order.create(payload);
   const populated = await Order.findById(order._id).populate('branchId', 'name').lean();
@@ -122,7 +123,7 @@ router.post('/', asyncHandler<AuthRequest>(async (req, res) => {
   res.status(201).json(populated);
 }));
 
-router.put('/:id', asyncHandler<AuthRequest>(async (req, res) => {
+router.put('/:id', requireWriteAccess, asyncHandler<AuthRequest>(async (req, res) => {
   const existing = await Order.findById(req.params.id).lean();
   if (!existing) {
     res.status(404).json({ message: 'Not found' });
@@ -165,7 +166,7 @@ router.put('/:id', asyncHandler<AuthRequest>(async (req, res) => {
   res.json(result);
 }));
 
-router.patch('/:id/status', asyncHandler<AuthRequest>(async (req, res) => {
+router.patch('/:id/status', requireWriteAccess, asyncHandler<AuthRequest>(async (req, res) => {
   const { status } = req.body as { status: OrderStatus };
   if (!ORDER_STATUSES.includes(status)) {
     res.status(400).json({ message: 'Invalid status' });
@@ -204,7 +205,7 @@ router.patch('/:id/status', asyncHandler<AuthRequest>(async (req, res) => {
   res.json(result);
 }));
 
-router.patch('/:id/items/:index/arrived', asyncHandler<AuthRequest>(async (req, res) => {
+router.patch('/:id/items/:index/arrived', requireWriteAccess, asyncHandler<AuthRequest>(async (req, res) => {
   const index = parseInt(req.params.index, 10);
   const { arrived } = req.body as { arrived: boolean };
 
@@ -254,7 +255,7 @@ router.patch('/:id/items/:index/arrived', asyncHandler<AuthRequest>(async (req, 
   res.json(result);
 }));
 
-router.delete('/:id', asyncHandler<AuthRequest>(async (req, res) => {
+router.delete('/:id', requireWriteAccess, asyncHandler<AuthRequest>(async (req, res) => {
   const order = await Order.findById(req.params.id);
   if (!order) {
     res.status(404).json({ message: 'Not found' });

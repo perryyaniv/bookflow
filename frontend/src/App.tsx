@@ -37,7 +37,9 @@ export default function App() {
         >
           <Route index element={<Dashboard />} />
           <Route path="orders" element={<Navigate to="/" replace />} />
-          <Route path="orders/new" element={<NewOrder />} />
+          <Route path="orders/new" element={
+            <RequireRole roles={['admin', 'editor']}><NewOrder /></RequireRole>
+          } />
           <Route path="orders/:id" element={<OrderDetail />} />
           <Route path="audit-log" element={
             <RequireRole roles={['admin']}><AuditLog /></RequireRole>

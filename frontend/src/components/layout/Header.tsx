@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
+import { ROLE_LABELS } from '../../utils/roles';
 
 function usePageTitle() {
   const location = useLocation();
@@ -135,7 +136,7 @@ export default function Header() {
                 <div>
                   <p className="text-sm font-medium text-white">{user?.name}</p>
                   <p className="text-xs text-white/50 mt-0.5">
-                    {{ admin: 'מנהל', clerk: 'פקיד' }[user?.role ?? 'clerk']}
+                    {user?.role ? ROLE_LABELS[user.role] : ''}
                   </p>
                 </div>
                 <button onClick={() => { clearAuth(); setDrawerOpen(false); }}

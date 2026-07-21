@@ -1,6 +1,10 @@
-export function getNavTabs(isAdmin: boolean): string[] {
-  const tabs = ['/', '/orders/new'];
-  if (isAdmin) tabs.push('/settings');
+import { UserRole } from '../../types';
+import { hasWriteAccess } from '../../utils/roles';
+
+export function getNavTabs(role?: UserRole): string[] {
+  const tabs = ['/'];
+  if (hasWriteAccess(role)) tabs.push('/orders/new');
+  if (role === 'admin') tabs.push('/settings');
   return tabs;
 }
 

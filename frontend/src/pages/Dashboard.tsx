@@ -5,6 +5,8 @@ import { getOrders } from '../api/orders';
 import { getSettings } from '../api/settings';
 import { Order, OrderStatus, ORDER_STATUSES } from '../types';
 import { getAlertLevel, getAlertAgeDays, AlertLevel } from '../utils/alertLevel';
+import { useAuth } from '../contexts/AuthContext';
+import { hasWriteAccess } from '../utils/roles';
 import OrderCard from '../components/orders/OrderCard';
 import OrderAlertTable from '../components/orders/OrderAlertTable';
 import Button from '../components/ui/Button';
@@ -34,6 +36,8 @@ const HIDDEN_BY_DEFAULT_STATUSES: OrderStatus[] = ['בוטל', 'נאסף'];
 
 export default function Dashboard() {
   const { t } = useTranslation();
+  const { user } = useAuth();
+  const canWrite = hasWriteAccess(user?.role);
   const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [orders, setOrders] = useState<Order[]>([]);
@@ -229,7 +233,7 @@ export default function Dashboard() {
           {view === 'cards' ? (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
               {pagedRows.map(({ order, level }) => (
-                <OrderCard key={order._id} order={order} level={level} onStatusChanged={handleStatusChanged} />
+                <OrderCard key={order._id} order={order} level={level} canWrite={canWrite} onStatusChanged={handleStatusChanged} />
               ))}
             </div>
           ) : (

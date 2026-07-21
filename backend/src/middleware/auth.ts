@@ -19,7 +19,9 @@ export function authenticate(req: AuthRequest, res: Response, next: NextFunction
       name: string;
       role: UserRole;
     };
-    req.user = payload;
+    // Legacy tokens issued before the 3-role split may still carry the old 'clerk' role.
+    const legacyRole = payload.role as unknown as string;
+    req.user = { ...payload, role: legacyRole === 'clerk' ? 'editor' : payload.role };
     next();
   } catch {
     res.status(401).json({ message: 'Invalid token' });

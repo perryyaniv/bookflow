@@ -25,8 +25,6 @@ export default function Layout() {
   const navigate = useNavigate();
   const touchStart = useRef<{ x: number; y: number; skip: boolean } | null>(null);
 
-  const isAdmin = user?.role === 'admin';
-
   const handleTouchStart = (e: React.TouchEvent) => {
     const t = e.touches[0];
     touchStart.current = { x: t.clientX, y: t.clientY, skip: isInsideHorizontalScroller(e.target) };
@@ -42,7 +40,7 @@ export default function Layout() {
     const dy = t.clientY - start.y;
     if (Math.abs(dx) < SWIPE_MIN_DISTANCE || Math.abs(dx) < Math.abs(dy) * 1.5) return;
 
-    const tabs = getNavTabs(isAdmin);
+    const tabs = getNavTabs(user?.role);
     const currentIndex = tabs.indexOf(getActiveTabPath(location.pathname, tabs) ?? '');
     if (currentIndex === -1) return;
 

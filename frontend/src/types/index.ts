@@ -1,4 +1,4 @@
-export type UserRole = 'admin' | 'clerk';
+export type UserRole = 'admin' | 'editor' | 'viewer';
 
 export type OrderStatus = 'נוצר' | 'הוזמן' | 'הגיע חלקית' | 'הגיע' | 'הלקוח עודכן' | 'נאסף' | 'בוטל';
 

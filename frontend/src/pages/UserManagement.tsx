@@ -7,13 +7,9 @@ import Button from '../components/ui/Button';
 import Modal from '../components/ui/Modal';
 import Spinner from '../components/ui/Spinner';
 import { formatDate } from '../utils/date';
+import { ROLE_LABELS } from '../utils/roles';
 
-const ROLES: UserRole[] = ['admin', 'clerk'];
-
-const ROLE_LABELS: Record<UserRole, string> = {
-  admin: 'מנהל',
-  clerk: 'פקיד',
-};
+const ROLES: UserRole[] = ['admin', 'editor', 'viewer'];
 
 export default function UserManagement() {
   const { t } = useTranslation();
@@ -22,7 +18,7 @@ export default function UserManagement() {
   const [loading, setLoading] = useState(true);
   const [addModal, setAddModal] = useState(false);
   const [resetModal, setResetModal] = useState<User | null>(null);
-  const [newUser, setNewUser] = useState({ name: '', username: '', password: '', role: 'clerk' as UserRole, branchId: '' });
+  const [newUser, setNewUser] = useState({ name: '', username: '', password: '', role: 'editor' as UserRole, branchId: '' });
   const [tempPassword, setTempPassword] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -42,7 +38,7 @@ export default function UserManagement() {
       const user = await createUser({ ...newUser, branchId: newUser.branchId || undefined });
       setUsers((prev) => [user, ...prev]);
       setAddModal(false);
-      setNewUser({ name: '', username: '', password: '', role: 'clerk', branchId: '' });
+      setNewUser({ name: '', username: '', password: '', role: 'editor', branchId: '' });
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
       setError(msg || 'שגיאה');

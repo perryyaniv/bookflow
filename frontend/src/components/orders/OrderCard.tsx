@@ -13,6 +13,7 @@ import Button from '../ui/Button';
 interface Props {
   order: Order;
   level: AlertLevel;
+  canWrite: boolean;
   onStatusChanged?: (updated: Order) => void;
 }
 
@@ -30,7 +31,7 @@ const NEXT_STATUS: Partial<Record<OrderStatus, OrderStatus>> = {
   'הלקוח עודכן': 'נאסף',
 };
 
-export default function OrderCard({ order, level, onStatusChanged }: Props) {
+export default function OrderCard({ order, level, canWrite, onStatusChanged }: Props) {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [changing, setChanging] = useState(false);
@@ -124,7 +125,7 @@ export default function OrderCard({ order, level, onStatusChanged }: Props) {
         </p>
       )}
 
-      {!isTerminal && (
+      {!isTerminal && canWrite && (
         <div
           className="mt-3 pt-3 border-t border-gray-100 flex items-center gap-2"
           onClick={(e) => e.stopPropagation()}

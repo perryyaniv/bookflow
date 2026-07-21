@@ -44,7 +44,7 @@ router.put('/:id', asyncHandler<AuthRequest>(async (req, res) => {
   if (branchId !== undefined) update.branchId = branchId || null;
   if (name !== undefined) update.name = name;
 
-  const user = await User.findByIdAndUpdate(req.params.id, update, { new: true }).select('-password');
+  const user = await User.findByIdAndUpdate(req.params.id, update, { new: true, runValidators: true }).select('-password');
   if (!user) {
     res.status(404).json({ message: 'User not found' });
     return;

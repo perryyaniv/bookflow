@@ -16,6 +16,7 @@ import { AuditLogEntry } from '../types';
 import { io } from 'socket.io-client';
 import { formatDate, formatDateTime } from '../utils/date';
 import { AlertLevel, getAlertLevel, getAlertText } from '../utils/alertLevel';
+import { hasWriteAccess } from '../utils/roles';
 
 const ALERT_ICON_COLOR: Record<AlertLevel, string> = {
   red: 'text-red-600',
@@ -51,6 +52,7 @@ export default function OrderDetail() {
 
   const { showToast } = useToast();
   const isAdmin = user?.role === 'admin';
+  const canWrite = hasWriteAccess(user?.role);
 
   useEffect(() => {
     if (!id) return;
@@ -153,8 +155,8 @@ export default function OrderDetail() {
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
-          {!editing && <Button size="sm" onClick={() => setEditing(true)}>{t('orders.edit')}</Button>}
-          {isAdmin && (
+          {!editing && canWrite && <Button size="sm" onClick={() => setEditing(true)}>{t('orders.edit')}</Button>}
+          {canWrite && (
             <Button variant="danger" size="sm" onClick={() => setDeleteModal(true)}>{t('orders.delete')}</Button>
           )}
         </div>
@@ -223,7 +225,7 @@ export default function OrderDetail() {
                             <input
                               type="checkbox"
                               checked={it.arrived}
-                              disabled={order.status === 'נאסף' || order.status === 'בוטל'}
+                              disabled={order.status === 'נאסף' || order.status === 'בוטל' || !canWrite}
                               onChange={(e) => handleToggleArrived(idx, e.target.checked)}
                               className="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary disabled:opacity-50"
                             />
