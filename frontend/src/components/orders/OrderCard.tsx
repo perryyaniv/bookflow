@@ -100,7 +100,7 @@ export default function OrderCard({ order, level, canWrite, onStatusChanged }: P
               </span>
             )}
           </div>
-          <p className="text-xs text-gray-400 mt-0.5">{order.customerPhone}</p>
+          <p className="text-xs font-bold text-gray-600 mt-0.5">{order.customerPhone}</p>
         </div>
         <StatusBadge status={order.status} />
       </div>
@@ -160,25 +160,15 @@ export default function OrderCard({ order, level, canWrite, onStatusChanged }: P
           {order.notes && (
             <p className="text-xs text-gray-600 whitespace-pre-wrap">{order.notes}</p>
           )}
-
-          <button
-            onClick={(e) => { e.stopPropagation(); navigate(`/orders/${order._id}`); }}
-            className="text-xs font-semibold text-primary hover:text-primary-dark flex items-center gap-1"
-          >
-            {t('orders.details')}
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
         </div>
       )}
 
-      {expanded && !isTerminal && canWrite && (
+      {expanded && (
         <div
           className="mt-3 pt-3 border-t border-gray-100 flex items-center gap-2"
           onClick={(e) => e.stopPropagation()}
         >
-          {nextStatus && (
+          {!isTerminal && canWrite && nextStatus && (
             <div className="relative flex-1 flex">
               <button
                 onClick={handleAdvanceClick}
@@ -221,13 +211,24 @@ export default function OrderCard({ order, level, canWrite, onStatusChanged }: P
               )}
             </div>
           )}
+          {!isTerminal && canWrite && (
+            <button
+              onClick={handleCancelClick}
+              disabled={changing}
+              title="בטל הזמנה"
+              className="px-3 py-1.5 rounded-md text-xs font-semibold text-red-500 hover:bg-red-50 transition-colors border border-red-200 hover:border-red-300"
+            >
+              בוטל
+            </button>
+          )}
           <button
-            onClick={handleCancelClick}
-            disabled={changing}
-            title="בטל הזמנה"
-            className="px-3 py-1.5 rounded-md text-xs font-semibold text-red-500 hover:bg-red-50 transition-colors border border-red-200 hover:border-red-300"
+            onClick={(e) => { e.stopPropagation(); navigate(`/orders/${order._id}`); }}
+            className="flex-shrink-0 px-3 py-1.5 rounded-md text-xs font-semibold text-primary border border-primary/30 hover:bg-primary/5 transition-colors flex items-center gap-1"
           >
-            בוטל
+            {t('orders.details')}
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
           </button>
         </div>
       )}
