@@ -23,14 +23,6 @@ const ALERT_TEXT_COLOR: Record<AlertLevel, string> = {
   green: '',
 };
 
-const NEXT_STATUS: Partial<Record<OrderStatus, OrderStatus>> = {
-  'נוצר': 'הוזמן',
-  'הוזמן': 'הגיע',
-  'הגיע חלקית': 'הגיע',
-  'הגיע': 'הלקוח עודכן',
-  'הלקוח עודכן': 'נאסף',
-};
-
 const JUMPABLE_STATUSES = ORDER_STATUSES.filter((s) => s !== 'בוטל');
 
 const STATUS_ACCENT_BORDER: Record<OrderStatus, string> = {
@@ -43,6 +35,16 @@ const STATUS_ACCENT_BORDER: Record<OrderStatus, string> = {
   'בוטל': 'border-r-status-cancelled',
 };
 
+const STATUS_DOT: Record<OrderStatus, string> = {
+  'נוצר': 'bg-status-created',
+  'הוזמן': 'bg-status-ordered',
+  'הגיע חלקית': 'bg-status-partial',
+  'הגיע': 'bg-status-arrived',
+  'הלקוח עודכן': 'bg-status-notified',
+  'נאסף': 'bg-status-collected',
+  'בוטל': 'bg-status-cancelled',
+};
+
 export default function OrderCard({ order, level, canWrite, onStatusChanged }: Props) {
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -52,7 +54,6 @@ export default function OrderCard({ order, level, canWrite, onStatusChanged }: P
   const [menuOpen, setMenuOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
 
-  const nextStatus = NEXT_STATUS[order.status];
   const isTerminal = order.status === 'נאסף' || order.status === 'בוטל';
   const alertMsg = getAlertText(order, level, t);
   const isCancelConfirm = confirmStatus === 'בוטל';
@@ -70,12 +71,6 @@ export default function OrderCard({ order, level, canWrite, onStatusChanged }: P
       setChanging(false);
       setConfirmStatus(null);
     }
-  };
-
-  const handleAdvanceClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!nextStatus) return;
-    setConfirmStatus(nextStatus);
   };
 
   const handleCancelClick = (e: React.MouseEvent) => {
@@ -112,7 +107,43 @@ export default function OrderCard({ order, level, canWrite, onStatusChanged }: P
           </div>
           <p className="text-xs font-bold text-gray-600 mt-0.5">{order.customerPhone}</p>
         </div>
-        <StatusBadge status={order.status} />
+
+        {canWrite ? (
+          <div className="relative flex-shrink-0">
+            <button
+              onClick={(e) => { e.stopPropagation(); setMenuOpen((o) => !o); }}
+              className="flex items-center gap-1 rounded-md px-1.5 py-0.5 -mx-1.5 -my-0.5 hover:bg-gray-50 transition-colors"
+            >
+              <StatusBadge status={order.status} />
+              <svg className="w-3 h-3 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            {menuOpen && (
+              <>
+                <div className="fixed inset-0 z-10" onClick={(e) => { e.stopPropagation(); setMenuOpen(false); }} />
+                <div className="absolute top-full mt-1 right-0 z-20 bg-white border border-gray-200 rounded-md shadow-lg py-1 w-40 max-h-56 overflow-y-auto">
+                  {JUMPABLE_STATUSES.map((s) => (
+                    <button
+                      key={s}
+                      onClick={(e) => handleJumpTo(e, s)}
+                      disabled={s === order.status}
+                      className={`w-full flex items-center gap-2 text-right px-3 py-1.5 text-xs transition-colors ${
+                        s === order.status ? 'text-gray-400 cursor-default' : 'text-gray-700 hover:bg-primary/5'
+                      }`}
+                    >
+                      <span className={`w-2 h-2 rounded-full flex-shrink-0 ${STATUS_DOT[s]}`} />
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        ) : (
+          <StatusBadge status={order.status} />
+        )}
       </div>
 
       <div className="flex items-center justify-between gap-2">
@@ -175,63 +206,21 @@ export default function OrderCard({ order, level, canWrite, onStatusChanged }: P
 
       {expanded && (
         <div
-          className="mt-3 pt-3 border-t border-gray-100 grid grid-cols-3 gap-2"
+          className="mt-3 pt-3 border-t border-gray-100 flex items-center gap-2"
           onClick={(e) => e.stopPropagation()}
         >
           <button
             onClick={(e) => { e.stopPropagation(); navigate(`/orders/${order._id}`); }}
-            className="min-w-0 px-3 py-1.5 rounded-md text-xs font-semibold text-white bg-amber-500 hover:bg-amber-600 transition-colors truncate"
+            className="flex-1 min-w-0 px-3 py-1.5 rounded-md text-xs font-semibold text-white bg-primary hover:bg-primary-dark transition-colors truncate"
           >
             {t('orders.details')}
           </button>
-          {!isTerminal && canWrite && nextStatus && (
-            <div className="relative min-w-0 flex">
-              <button
-                onClick={handleAdvanceClick}
-                disabled={changing}
-                title={`שנה סטטוס ל-${nextStatus}`}
-                className="flex-1 min-w-0 flex items-center justify-center px-3 py-1.5 rounded-r-md rounded-l-none text-xs font-semibold transition-colors bg-primary text-white hover:bg-primary-dark truncate"
-              >
-                {nextStatus}
-              </button>
-              <button
-                onClick={(e) => { e.stopPropagation(); setMenuOpen((o) => !o); }}
-                disabled={changing}
-                title="בחר סטטוס"
-                className="flex-shrink-0 px-2 flex items-center justify-center rounded-l-md rounded-r-none border-r border-primary-dark/40 bg-primary text-white hover:bg-primary-dark transition-colors"
-              >
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-
-              {menuOpen && (
-                <>
-                  <div className="fixed inset-0 z-10" onClick={(e) => { e.stopPropagation(); setMenuOpen(false); }} />
-                  <div className="absolute bottom-full mb-1 right-0 z-20 bg-white border border-gray-200 rounded-md shadow-lg py-1 w-40 max-h-56 overflow-y-auto">
-                    {JUMPABLE_STATUSES.map((s) => (
-                      <button
-                        key={s}
-                        onClick={(e) => handleJumpTo(e, s)}
-                        disabled={s === order.status}
-                        className={`w-full text-right px-3 py-1.5 text-xs transition-colors ${
-                          s === order.status ? 'text-gray-400 cursor-default' : 'text-gray-700 hover:bg-primary/5'
-                        }`}
-                      >
-                        {s}
-                      </button>
-                    ))}
-                  </div>
-                </>
-              )}
-            </div>
-          )}
           {!isTerminal && canWrite && (
             <button
               onClick={handleCancelClick}
               disabled={changing}
               title="בטל הזמנה"
-              className="min-w-0 px-3 py-1.5 rounded-md text-xs font-semibold text-red-500 hover:bg-red-50 transition-colors border border-red-200 hover:border-red-300 truncate"
+              className="flex-1 min-w-0 px-3 py-1.5 rounded-md text-xs font-semibold text-red-500 hover:bg-red-50 transition-colors border border-red-200 hover:border-red-300 truncate"
             >
               בוטל
             </button>
