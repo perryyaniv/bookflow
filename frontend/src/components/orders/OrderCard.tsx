@@ -170,7 +170,7 @@ export default function OrderCard({ order, level, canWrite, onStatusChanged }: P
         >
           <button
             onClick={(e) => { e.stopPropagation(); navigate(`/orders/${order._id}`); }}
-            className="flex-shrink-0 px-3 py-1.5 rounded-md text-xs font-semibold text-white bg-green-600 hover:bg-green-700 transition-colors"
+            className="flex-1 px-3 py-1.5 rounded-md text-xs font-semibold text-white bg-amber-500 hover:bg-amber-600 transition-colors"
           >
             {t('orders.details')}
           </button>
@@ -221,7 +221,7 @@ export default function OrderCard({ order, level, canWrite, onStatusChanged }: P
               onClick={handleCancelClick}
               disabled={changing}
               title="בטל הזמנה"
-              className="flex-shrink-0 px-3 py-1.5 rounded-md text-xs font-semibold text-red-500 hover:bg-red-50 transition-colors border border-red-200 hover:border-red-300"
+              className="flex-1 px-3 py-1.5 rounded-md text-xs font-semibold text-red-500 hover:bg-red-50 transition-colors border border-red-200 hover:border-red-300"
             >
               בוטל
             </button>
