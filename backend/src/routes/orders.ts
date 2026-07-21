@@ -8,6 +8,7 @@ import { isNotArrived, isNotCollected } from '../utils/alerts';
 import { asyncHandler } from '../utils/asyncHandler';
 
 const ARRIVAL_ADVANCEABLE: OrderStatus[] = ['נוצר', 'הוזמן', 'הגיע חלקית', 'הגיע'];
+const ARRIVED_OR_LATER: OrderStatus[] = ['הגיע', 'הלקוח עודכן', 'נאסף'];
 
 function statusFromItemArrivals(items: IOrderItem[], currentStatus: OrderStatus): OrderStatus {
   if (!ARRIVAL_ADVANCEABLE.includes(currentStatus)) return currentStatus;
@@ -158,6 +159,12 @@ router.put('/:id', requireWriteAccess, asyncHandler<AuthRequest>(async (req, res
     update.statusChangedAt = new Date();
   }
 
+  const effectiveStatus = (newStatus ?? existing.status) as OrderStatus;
+  if (ARRIVED_OR_LATER.includes(effectiveStatus)) {
+    const items = (update.items as IOrderItem[] | undefined) ?? existing.items;
+    update.items = items.map((it) => ({ ...it, arrived: true }));
+  }
+
   const io: Server = req.app.get('io');
   const updated = await Order.findByIdAndUpdate(req.params.id, update, { new: true })
     .populate('branchId', 'name')
@@ -202,7 +209,7 @@ router.patch('/:id/status', requireWriteAccess, asyncHandler<AuthRequest>(async 
   existing.status = status;
   existing.updatedBy = req.user!.userId as never;
   if (status === 'הוזמן' && !existing.orderedAt) existing.orderedAt = new Date();
-  if (status === 'הגיע') existing.items.forEach((i) => { i.arrived = true; });
+  if (ARRIVED_OR_LATER.includes(status)) existing.items.forEach((i) => { i.arrived = true; });
   if (status === 'הלקוח עודכן' && !existing.customerNotifiedAt) existing.customerNotifiedAt = new Date();
   if (status !== oldStatus) existing.statusChangedAt = new Date();
   await existing.save();
@@ -245,6 +252,7 @@ router.patch('/:id/items/:index/arrived', requireWriteAccess, asyncHandler<AuthR
   const newStatus = statusFromItemArrivals(existing.items, existing.status);
   existing.status = newStatus;
   existing.updatedBy = req.user!.userId as never;
+  if (ARRIVED_OR_LATER.includes(newStatus)) existing.items.forEach((i) => { i.arrived = true; });
   if ((newStatus === 'הגיע' || newStatus === 'הגיע חלקית') && !existing.orderedAt) existing.orderedAt = new Date();
   if (newStatus !== oldStatus) existing.statusChangedAt = new Date();
   await existing.save();

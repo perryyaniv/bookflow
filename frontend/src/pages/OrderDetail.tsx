@@ -225,7 +225,7 @@ export default function OrderDetail() {
                             <input
                               type="checkbox"
                               checked={it.arrived}
-                              disabled={order.status === 'נאסף' || order.status === 'בוטל' || !canWrite}
+                              disabled={order.status === 'הלקוח עודכן' || order.status === 'נאסף' || order.status === 'בוטל' || !canWrite}
                               onChange={(e) => handleToggleArrived(idx, e.target.checked)}
                               className="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary disabled:opacity-50"
                             />
