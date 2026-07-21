@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Order, OrderStatus } from '../../types';
+import { Order, OrderStatus, ORDER_STATUSES } from '../../types';
 import { AlertLevel, getAlertText } from '../../utils/alertLevel';
 import { StatusBadge } from '../ui/Badge';
 import { formatDate } from '../../utils/date';
@@ -31,12 +31,15 @@ const NEXT_STATUS: Partial<Record<OrderStatus, OrderStatus>> = {
   'הלקוח עודכן': 'נאסף',
 };
 
+const JUMPABLE_STATUSES = ORDER_STATUSES.filter((s) => s !== 'בוטל');
+
 export default function OrderCard({ order, level, canWrite, onStatusChanged }: Props) {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [changing, setChanging] = useState(false);
   const { showToast } = useToast();
   const [confirmStatus, setConfirmStatus] = useState<OrderStatus | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const nextStatus = NEXT_STATUS[order.status];
   const isTerminal = order.status === 'נאסף' || order.status === 'בוטל';
@@ -67,6 +70,13 @@ export default function OrderCard({ order, level, canWrite, onStatusChanged }: P
   const handleCancelClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     setConfirmStatus('בוטל');
+  };
+
+  const handleJumpTo = (e: React.MouseEvent, status: OrderStatus) => {
+    e.stopPropagation();
+    setMenuOpen(false);
+    if (status === order.status) return;
+    setConfirmStatus(status);
   };
 
   return (
@@ -131,15 +141,47 @@ export default function OrderCard({ order, level, canWrite, onStatusChanged }: P
           onClick={(e) => e.stopPropagation()}
         >
           {nextStatus && (
-            <button
-              onClick={handleAdvanceClick}
-              disabled={changing}
-              title={`שנה סטטוס ל-${nextStatus}`}
-              className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-colors bg-primary text-white hover:bg-primary-dark"
-            >
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-              {nextStatus}
-            </button>
+            <div className="relative flex-1 flex">
+              <button
+                onClick={handleAdvanceClick}
+                disabled={changing}
+                title={`שנה סטטוס ל-${nextStatus}`}
+                className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-r-md rounded-l-none text-xs font-semibold transition-colors bg-primary text-white hover:bg-primary-dark"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                {nextStatus}
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); setMenuOpen((o) => !o); }}
+                disabled={changing}
+                title="בחר סטטוס"
+                className="flex-shrink-0 px-2 flex items-center justify-center rounded-l-md rounded-r-none border-r border-primary-dark/40 bg-primary text-white hover:bg-primary-dark transition-colors"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {menuOpen && (
+                <>
+                  <div className="fixed inset-0 z-10" onClick={(e) => { e.stopPropagation(); setMenuOpen(false); }} />
+                  <div className="absolute bottom-full mb-1 right-0 z-20 bg-white border border-gray-200 rounded-md shadow-lg py-1 w-40 max-h-56 overflow-y-auto">
+                    {JUMPABLE_STATUSES.map((s) => (
+                      <button
+                        key={s}
+                        onClick={(e) => handleJumpTo(e, s)}
+                        disabled={s === order.status}
+                        className={`w-full text-right px-3 py-1.5 text-xs transition-colors ${
+                          s === order.status ? 'text-gray-400 cursor-default' : 'text-gray-700 hover:bg-primary/5'
+                        }`}
+                      >
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
           )}
           <button
             onClick={handleCancelClick}
