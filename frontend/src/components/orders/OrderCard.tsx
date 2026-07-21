@@ -1,7 +1,9 @@
 import { useState } from 'react';
+import { TFunction } from 'i18next';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Order, OrderStatus } from '../../types';
+import { AlertLevel } from '../../utils/alertLevel';
 import { StatusBadge } from '../ui/Badge';
 import { formatDate } from '../../utils/date';
 import { changeOrderStatus } from '../../api/orders';
@@ -11,7 +13,21 @@ import Button from '../ui/Button';
 
 interface Props {
   order: Order;
+  level: AlertLevel;
   onStatusChanged?: (updated: Order) => void;
+}
+
+const ALERT_TEXT_COLOR: Record<AlertLevel, string> = {
+  red: 'text-red-600',
+  yellow: 'text-amber-600',
+  green: '',
+};
+
+function alertText(order: Order, level: AlertLevel, t: TFunction): string | null {
+  if (level === 'green') return null;
+  if (level === 'red') return order.isNotArrived ? t('orders.notArrived') : t('orders.notCollected');
+  const isArrivedType = order.status === 'הוזמן' || order.status === 'הגיע חלקית';
+  return isArrivedType ? t('orders.approachingNotArrived') : t('orders.approachingNotCollected');
 }
 
 const NEXT_STATUS: Partial<Record<OrderStatus, OrderStatus>> = {
@@ -22,7 +38,7 @@ const NEXT_STATUS: Partial<Record<OrderStatus, OrderStatus>> = {
   'הלקוח עודכן': 'נאסף',
 };
 
-export default function OrderCard({ order, onStatusChanged }: Props) {
+export default function OrderCard({ order, level, onStatusChanged }: Props) {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [changing, setChanging] = useState(false);
@@ -31,6 +47,7 @@ export default function OrderCard({ order, onStatusChanged }: Props) {
 
   const nextStatus = NEXT_STATUS[order.status];
   const isTerminal = order.status === 'נאסף' || order.status === 'בוטל';
+  const alertMsg = alertText(order, level, t);
 
   const doStatusChange = async (status: OrderStatus) => {
     setChanging(true);
@@ -65,9 +82,19 @@ export default function OrderCard({ order, onStatusChanged }: Props) {
     >
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="flex-1 min-w-0">
-          <h3 className="font-bold text-gray-900 text-sm leading-tight group-hover:text-primary transition-colors truncate">
-            {order.customerName}
-          </h3>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h3 className="font-bold text-gray-900 text-sm leading-tight group-hover:text-primary transition-colors truncate">
+              {order.customerName}
+            </h3>
+            {alertMsg && (
+              <span className={`flex items-center gap-1 font-bold text-sm leading-tight flex-shrink-0 ${ALERT_TEXT_COLOR[level]}`}>
+                <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                </svg>
+                {alertMsg}
+              </span>
+            )}
+          </div>
           <p className="text-xs text-gray-400 mt-0.5">{order.customerPhone}</p>
         </div>
         <StatusBadge status={order.status} />
@@ -89,8 +116,8 @@ export default function OrderCard({ order, onStatusChanged }: Props) {
       {order.items?.length > 0 && (
         <div className="mt-2 flex flex-wrap gap-1">
           {order.items.slice(0, 3).map((it, idx) => (
-            <span key={idx} className={`text-xs px-2 py-0.5 rounded-full truncate max-w-[10rem] border ${it.arrived ? 'bg-status-partial/10 text-status-partial border-status-partial/30' : 'bg-primary/8 text-primary border-primary/20'}`}>
-              {it.bookName} ×{it.quantity}
+            <span key={idx} className={`text-xs px-2 py-0.5 rounded-full truncate max-w-[16rem] border ${it.arrived ? 'bg-status-partial/10 text-status-partial border-status-partial/30' : 'bg-primary/8 text-primary border-primary/20'}`}>
+              {it.bookName}{it.sku ? ` · ${t('orders.sku')}: ${it.sku}` : ''} ×{it.quantity}
             </span>
           ))}
           {order.items.length > 3 && (
@@ -103,15 +130,6 @@ export default function OrderCard({ order, onStatusChanged }: Props) {
         <p className="mt-1.5 text-xs font-medium text-status-partial">
           {order.items.filter((i) => i.arrived).length} מתוך {order.items.length} ספרים הגיעו
         </p>
-      )}
-
-      {(order.isNotArrived || order.isNotCollected) && (
-        <div className="mt-2 flex items-center gap-1.5 text-red-500 text-xs font-medium">
-          <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
-          </svg>
-          {order.isNotArrived ? t('orders.notArrived') : t('orders.notCollected')}
-        </div>
       )}
 
       {!isTerminal && (

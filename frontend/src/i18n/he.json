@@ -54,9 +54,16 @@
     "of": "מתוך",
     "notArrived": "לא הגיע",
     "notCollected": "לא נאסף",
+    "approachingNotArrived": "מתקרב ל\"לא הגיע\"",
+    "approachingNotCollected": "מתקרב ל\"לא נאסף\"",
     "invalidPhone": "מספר טלפון לא תקין",
     "lastStatusChange": "שינוי סטטוס אחרון",
-    "noResultsSearch": "לא נמצאו הזמנות התואמות לחיפוש"
+    "noResultsSearch": "לא נמצאו הזמנות התואמות לחיפוש",
+    "filterAllStatuses": "כל הסטטוסים",
+    "filterAllAlerts": "כל ההתראות",
+    "filterHasAlert": "יש אזהרה",
+    "filterNoAlert": "ללא אזהרה",
+    "filterAllPaid": "הכל"
   },
   "status": {
     "נוצר": "נוצר",

@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getOrders } from '../api/orders';
 import { getSettings } from '../api/settings';
-import { Order } from '../types';
+import { Order, OrderStatus, ORDER_STATUSES } from '../types';
 import { getAlertLevel, getAlertAgeDays, AlertLevel } from '../utils/alertLevel';
 import OrderCard from '../components/orders/OrderCard';
 import OrderAlertTable from '../components/orders/OrderAlertTable';
@@ -39,6 +39,10 @@ export default function Dashboard() {
   const [thresholds, setThresholds] = useState({ notArrivedThresholdDays: 14, notCollectedThresholdDays: 14 });
   const [view, setView] = useState<'cards' | 'table'>('table');
   const [search, setSearch] = useState(searchParams.get('search') ?? '');
+  const [statusFilter, setStatusFilter] = useState<OrderStatus | ''>('');
+  const [alertFilter, setAlertFilter] = useState<'' | 'alert' | 'none'>('');
+  const [paidFilter, setPaidFilter] = useState<'' | 'true' | 'false'>('');
+  const [customerFilter, setCustomerFilter] = useState('');
   const [page, setPage] = useState(1);
 
   useEffect(() => {
@@ -61,7 +65,7 @@ export default function Dashboard() {
       .finally(() => setLoading(false));
   }, []);
 
-  useEffect(() => { setPage(1); }, [search]);
+  useEffect(() => { setPage(1); }, [search, statusFilter, alertFilter, paidFilter, customerFilter]);
 
   const handleStatusChanged = (updated: Order) => {
     setOrders((prev) => prev.map((o) => (o._id === updated._id ? updated : o)));
@@ -78,8 +82,14 @@ export default function Dashboard() {
 
   const filteredRows = useMemo(() => {
     const q = search.trim().toLowerCase();
-    if (!q) return rows;
-    return rows.filter(({ order }) => {
+    const nameQ = customerFilter.trim().toLowerCase();
+    return rows.filter(({ order, level }) => {
+      if (statusFilter && order.status !== statusFilter) return false;
+      if (paidFilter && String(order.isPaid) !== paidFilter) return false;
+      if (alertFilter === 'alert' && level === 'green') return false;
+      if (alertFilter === 'none' && level !== 'green') return false;
+      if (nameQ && !order.customerName.toLowerCase().includes(nameQ)) return false;
+      if (!q) return true;
       const haystack = [
         order.customerName,
         order.customerPhone,
@@ -92,7 +102,7 @@ export default function Dashboard() {
       ].filter(Boolean).join(' ').toLowerCase();
       return haystack.includes(q);
     });
-  }, [rows, search]);
+  }, [rows, search, statusFilter, alertFilter, paidFilter, customerFilter]);
 
   const sortedRows = useMemo(() => {
     return [...filteredRows].sort((a, b) => {
@@ -139,6 +149,41 @@ export default function Dashboard() {
         </div>
       </div>
 
+      <div className="flex items-center gap-2 flex-wrap">
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value as OrderStatus | '')}
+          className="input w-auto"
+        >
+          <option value="">{t('orders.filterAllStatuses')}</option>
+          {ORDER_STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+        </select>
+        <select
+          value={alertFilter}
+          onChange={(e) => setAlertFilter(e.target.value as '' | 'alert' | 'none')}
+          className="input w-auto"
+        >
+          <option value="">{t('orders.filterAllAlerts')}</option>
+          <option value="alert">{t('orders.filterHasAlert')}</option>
+          <option value="none">{t('orders.filterNoAlert')}</option>
+        </select>
+        <select
+          value={paidFilter}
+          onChange={(e) => setPaidFilter(e.target.value as '' | 'true' | 'false')}
+          className="input w-auto"
+        >
+          <option value="">{t('orders.filterAllPaid')}</option>
+          <option value="true">{t('orders.paid')}</option>
+          <option value="false">{t('orders.unpaid')}</option>
+        </select>
+        <input
+          value={customerFilter}
+          onChange={(e) => setCustomerFilter(e.target.value)}
+          placeholder={t('orders.customerName')}
+          className="input w-auto min-w-[140px]"
+        />
+      </div>
+
       {sortedRows.length === 0 ? (
         <div className="text-center py-20">
           <div className="w-16 h-16 bg-primary/10 rounded-2xl mx-auto mb-4 flex items-center justify-center">
@@ -147,15 +192,17 @@ export default function Dashboard() {
             </svg>
           </div>
           <h2 className="text-lg font-semibold text-gray-700">
-            {search ? t('orders.noResultsSearch') : 'אין הזמנות עדיין'}
+            {(search || statusFilter || alertFilter || paidFilter || customerFilter)
+              ? t('orders.noResultsSearch')
+              : 'אין הזמנות עדיין'}
           </h2>
         </div>
       ) : (
         <>
           {view === 'cards' ? (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-              {pagedRows.map(({ order }) => (
-                <OrderCard key={order._id} order={order} onStatusChanged={handleStatusChanged} />
+              {pagedRows.map(({ order, level }) => (
+                <OrderCard key={order._id} order={order} level={level} onStatusChanged={handleStatusChanged} />
               ))}
             </div>
           ) : (
