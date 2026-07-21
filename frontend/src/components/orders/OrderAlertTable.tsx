@@ -16,7 +16,7 @@ interface Props {
 const LEVEL_DOT: Record<AlertLevel, string> = {
   red: 'bg-red-500',
   yellow: 'bg-amber-400',
-  green: 'bg-green-500',
+  green: 'bg-primary',
 };
 
 function bookNames(order: Order): string {

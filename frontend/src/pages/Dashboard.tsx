@@ -10,13 +10,12 @@ import OrderAlertTable from '../components/orders/OrderAlertTable';
 import Button from '../components/ui/Button';
 import Spinner from '../components/ui/Spinner';
 
-type CardColor = 'gray' | 'green' | 'blue' | 'red';
+type CardColor = 'gray' | 'green' | 'red';
 
 const colorMap: Record<CardColor, { border: string; num: string }> = {
-  gray:  { border: 'border-r-gray-300',  num: 'text-gray-700' },
-  green: { border: 'border-r-green-400', num: 'text-green-700' },
-  blue:  { border: 'border-r-primary',   num: 'text-primary' },
-  red:   { border: 'border-r-red-400',   num: 'text-red-600' },
+  gray:  { border: 'border-r-gray-300', num: 'text-gray-700' },
+  green: { border: 'border-r-primary',  num: 'text-primary' },
+  red:   { border: 'border-r-red-400',  num: 'text-red-600' },
 };
 
 function StatCard({ label, value, color = 'gray' }: { label: string; value: number; color?: CardColor }) {
