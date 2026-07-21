@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { getAuditLog } from '../api/auditLog';
+import { getAuditLog, clearAuditLog } from '../api/auditLog';
 import { AuditLogEntry } from '../types';
 import Spinner from '../components/ui/Spinner';
 import Button from '../components/ui/Button';
+import Modal from '../components/ui/Modal';
 import { formatDate, formatDateTime } from '../utils/date';
 
 const FIELD_LABELS: Record<string, string> = {
@@ -34,6 +35,8 @@ export default function AuditLog() {
   const [search, setSearch] = useState('');
   const [inputSearch, setInputSearch] = useState('');
   const [loading, setLoading] = useState(true);
+  const [clearModal, setClearModal] = useState(false);
+  const [clearing, setClearing] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -55,6 +58,18 @@ export default function AuditLog() {
     setPage(1);
   };
 
+  const handleClear = async () => {
+    setClearing(true);
+    try {
+      await clearAuditLog();
+      setClearModal(false);
+      setPage(1);
+      await load();
+    } finally {
+      setClearing(false);
+    }
+  };
+
   return (
     <div className="space-y-4">
       <form onSubmit={handleSearch} className="flex gap-2">
@@ -70,6 +85,9 @@ export default function AuditLog() {
             נקה
           </Button>
         )}
+        <Button type="button" variant="danger" size="sm" onClick={() => setClearModal(true)}>
+          {t('auditLog.clearLog')}
+        </Button>
       </form>
 
       <div className="text-sm text-gray-500">{total} רשומות</div>
@@ -121,6 +139,14 @@ export default function AuditLog() {
           <Button variant="secondary" size="sm" disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>הבא</Button>
         </div>
       )}
+
+      <Modal open={clearModal} onClose={() => setClearModal(false)} title={t('auditLog.clearLog')} size="sm">
+        <p className="text-sm text-gray-600 mb-4">{t('auditLog.clearConfirm')}</p>
+        <div className="flex gap-3 justify-end">
+          <Button variant="secondary" onClick={() => setClearModal(false)}>{t('common.cancel')}</Button>
+          <Button variant="dangerSolid" loading={clearing} onClick={handleClear}>{t('auditLog.clearLog')}</Button>
+        </div>
+      </Modal>
     </div>
   );
 }

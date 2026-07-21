@@ -12,3 +12,6 @@ export const updateUser = (id: string, data: { role?: UserRole; active?: boolean
 
 export const resetPassword = (id: string, tempPassword: string) =>
   client.post(`/users/${id}/reset-password`, { tempPassword }).then((r) => r.data);
+
+export const deleteUser = (id: string) =>
+  client.delete(`/users/${id}`).then((r) => r.data);

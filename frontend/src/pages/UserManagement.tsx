@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { getUsers, createUser, updateUser, resetPassword } from '../api/users';
+import { getUsers, createUser, updateUser, resetPassword, deleteUser } from '../api/users';
 import { getBranches } from '../api/branches';
 import { User, UserRole, Branch } from '../types';
 import Button from '../components/ui/Button';
@@ -8,16 +8,22 @@ import Modal from '../components/ui/Modal';
 import Spinner from '../components/ui/Spinner';
 import { formatDate } from '../utils/date';
 import { ROLE_LABELS } from '../utils/roles';
+import { useAuth } from '../contexts/AuthContext';
+import { useToast } from '../contexts/ToastContext';
 
 const ROLES: UserRole[] = ['admin', 'editor', 'viewer'];
 
 export default function UserManagement() {
   const { t } = useTranslation();
+  const { user: currentUser } = useAuth();
+  const { showToast } = useToast();
   const [users, setUsers] = useState<User[]>([]);
   const [branches, setBranches] = useState<Branch[]>([]);
   const [loading, setLoading] = useState(true);
   const [addModal, setAddModal] = useState(false);
   const [resetModal, setResetModal] = useState<User | null>(null);
+  const [deleteModal, setDeleteModal] = useState<User | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const [newUser, setNewUser] = useState({ name: '', username: '', password: '', role: 'editor' as UserRole, branchId: '' });
   const [tempPassword, setTempPassword] = useState('');
   const [saving, setSaving] = useState(false);
@@ -62,6 +68,21 @@ export default function UserManagement() {
     await resetPassword(resetModal._id, tempPassword.trim());
     setResetModal(null);
     setTempPassword('');
+  };
+
+  const handleDelete = async () => {
+    if (!deleteModal) return;
+    setDeleting(true);
+    try {
+      await deleteUser(deleteModal._id);
+      setUsers((prev) => prev.filter((x) => x._id !== deleteModal._id));
+      setDeleteModal(null);
+    } catch (err: unknown) {
+      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
+      showToast(msg ?? 'שגיאה במחיקת המשתמש', 'error');
+    } finally {
+      setDeleting(false);
+    }
   };
 
   const branchName = (u: User) => {
@@ -129,6 +150,15 @@ export default function UserManagement() {
                     >
                       {u.active ? t('users.deactivate') : t('users.activate')}
                     </Button>
+                    <Button
+                      size="sm"
+                      variant="dangerSolid"
+                      disabled={u._id === currentUser?._id}
+                      title={u._id === currentUser?._id ? 'לא ניתן למחוק את המשתמש המחובר' : undefined}
+                      onClick={() => setDeleteModal(u)}
+                    >
+                      {t('common.delete')}
+                    </Button>
                   </div>
                 </td>
               </tr>
@@ -187,6 +217,16 @@ export default function UserManagement() {
             <Button variant="secondary" onClick={() => setResetModal(null)}>{t('common.cancel')}</Button>
             <Button onClick={handleResetPassword} disabled={!tempPassword.trim()}>{t('common.confirm')}</Button>
           </div>
+        </div>
+      </Modal>
+
+      <Modal open={!!deleteModal} onClose={() => setDeleteModal(null)} title={t('common.areYouSure')} size="sm">
+        <p className="text-sm text-gray-600 mb-4">
+          האם אתה בטוח שברצונך למחוק את המשתמש <strong>{deleteModal?.name}</strong>? פעולה זו אינה הפיכה.
+        </p>
+        <div className="flex gap-3 justify-end">
+          <Button variant="secondary" onClick={() => setDeleteModal(null)}>{t('common.cancel')}</Button>
+          <Button variant="dangerSolid" loading={deleting} onClick={handleDelete}>{t('common.delete')}</Button>
         </div>
       </Modal>
     </div>

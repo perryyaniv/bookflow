@@ -53,6 +53,28 @@ router.put('/:id', asyncHandler<AuthRequest>(async (req, res) => {
   res.json(user);
 }));
 
+router.delete('/:id', asyncHandler<AuthRequest>(async (req, res) => {
+  if (req.params.id === req.user!.userId) {
+    res.status(400).json({ message: 'לא ניתן למחוק את המשתמש המחובר' });
+    return;
+  }
+  const user = await User.findById(req.params.id);
+  if (!user) {
+    res.status(404).json({ message: 'User not found' });
+    return;
+  }
+  if (user.role === 'admin') {
+    const adminCount = await User.countDocuments({ role: 'admin' });
+    if (adminCount <= 1) {
+      res.status(400).json({ message: 'לא ניתן למחוק את המנהל האחרון במערכת' });
+      return;
+    }
+  }
+  await user.deleteOne();
+  await logAudit({ userId: req.user!.userId, userName: req.user!.name, action: `מחק משתמש ${user.name}` });
+  res.json({ message: 'Deleted' });
+}));
+
 router.post('/:id/reset-password', asyncHandler<AuthRequest>(async (req, res) => {
   const { tempPassword } = req.body;
   if (!tempPassword) {
