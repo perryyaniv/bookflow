@@ -30,10 +30,15 @@ function StatCard({ label, value, color = 'gray', selected, onClick }: {
   return (
     <button
       onClick={onClick}
-      className={`bg-white border border-gray-100 border-r-4 ${border} rounded-lg shadow-card px-3 py-1.5 flex flex-col items-center justify-center text-center transition-all ${
-        selected ? 'ring-2 ring-primary ring-offset-1' : 'opacity-60 hover:opacity-100'
-      }`}
+      className={`relative bg-white border border-gray-100 border-r-4 ${border} rounded-lg shadow-card px-3 py-1.5 flex flex-col items-center justify-center text-center transition-colors hover:bg-gray-50`}
     >
+      {selected && (
+        <span className="absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-primary text-white flex items-center justify-center">
+          <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+        </span>
+      )}
       <p className="text-[10px] text-gray-400 font-medium">{label}</p>
       <p className={`text-lg font-bold leading-none ${num}`}>{value}</p>
     </button>
