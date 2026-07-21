@@ -30,6 +30,7 @@ function StatCard({ label, value, color = 'gray' }: { label: string; value: numb
 
 const LEVEL_RANK: Record<AlertLevel, number> = { red: 2, yellow: 1, green: 0 };
 const PAGE_SIZE = 25;
+const HIDDEN_BY_DEFAULT_STATUSES: OrderStatus[] = ['בוטל', 'נאסף'];
 
 export default function Dashboard() {
   const { t } = useTranslation();
@@ -73,7 +74,9 @@ export default function Dashboard() {
   };
 
   const visibleOrders = useMemo(
-    () => (statusFilter === 'בוטל' ? orders : orders.filter((o) => o.status !== 'בוטל')),
+    () => (HIDDEN_BY_DEFAULT_STATUSES.includes(statusFilter as OrderStatus)
+      ? orders
+      : orders.filter((o) => !HIDDEN_BY_DEFAULT_STATUSES.includes(o.status))),
     [orders, statusFilter]
   );
 
@@ -118,9 +121,12 @@ export default function Dashboard() {
     });
   }, [filteredRows]);
 
-  const nonCancelledOrders = useMemo(() => orders.filter((o) => o.status !== 'בוטל'), [orders]);
-  const total = nonCancelledOrders.length;
-  const alarms = nonCancelledOrders.filter((o) => o.isNotArrived || o.isNotCollected).length;
+  const activeOrders = useMemo(
+    () => orders.filter((o) => !HIDDEN_BY_DEFAULT_STATUSES.includes(o.status)),
+    [orders]
+  );
+  const total = activeOrders.length;
+  const alarms = activeOrders.filter((o) => o.isNotArrived || o.isNotCollected).length;
   const totalPages = Math.max(1, Math.ceil(sortedRows.length / PAGE_SIZE));
   const pagedRows = sortedRows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
