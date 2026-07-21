@@ -19,13 +19,24 @@ const colorMap: Record<CardColor, { border: string; num: string }> = {
   red:   { border: 'border-r-red-400',  num: 'text-red-600' },
 };
 
-function StatCard({ label, value, color = 'gray' }: { label: string; value: number; color?: CardColor }) {
+function StatCard({ label, value, color = 'gray', selected, onClick }: {
+  label: string;
+  value: number;
+  color?: CardColor;
+  selected?: boolean;
+  onClick?: () => void;
+}) {
   const { border, num } = colorMap[color];
   return (
-    <div className={`bg-white border border-gray-100 border-r-4 ${border} rounded-lg shadow-card px-3 py-1.5 flex flex-col items-center justify-center text-center`}>
+    <button
+      onClick={onClick}
+      className={`bg-white border border-gray-100 border-r-4 ${border} rounded-lg shadow-card px-3 py-1.5 flex flex-col items-center justify-center text-center transition-all ${
+        selected ? 'ring-2 ring-primary ring-offset-1' : 'opacity-60 hover:opacity-100'
+      }`}
+    >
       <p className="text-[10px] text-gray-400 font-medium">{label}</p>
       <p className={`text-lg font-bold leading-none ${num}`}>{value}</p>
-    </div>
+    </button>
   );
 }
 
@@ -128,7 +139,6 @@ export default function Dashboard() {
     [orders]
   );
   const total = activeOrders.length;
-  const deliveredOrCancelled = orders.filter((o) => HIDDEN_BY_DEFAULT_STATUSES.includes(o.status)).length;
   const alarms = activeOrders.filter((o) => o.isNotArrived || o.isNotCollected).length;
   const totalPages = Math.max(1, Math.ceil(sortedRows.length / PAGE_SIZE));
   const pagedRows = sortedRows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
@@ -138,50 +148,46 @@ export default function Dashboard() {
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-3 gap-2">
-        <StatCard label={t('dashboard.inProgress')} value={total} color="green" />
-        <StatCard label={t('dashboard.alarms')} value={alarms} color="red" />
-        <StatCard label={t('dashboard.deliveredOrCancelled')} value={deliveredOrCancelled} color="gray" />
+        <StatCard
+          label={t('orders.scopeInProgress')}
+          value={total}
+          color="green"
+          selected={scope === 'inProgress'}
+          onClick={() => setScope('inProgress')}
+        />
+        <StatCard
+          label={t('orders.scopeAlerts')}
+          value={alarms}
+          color="red"
+          selected={scope === 'alerts'}
+          onClick={() => setScope('alerts')}
+        />
+        <StatCard
+          label={t('orders.scopeAll')}
+          value={orders.length}
+          color="gray"
+          selected={scope === 'all'}
+          onClick={() => setScope('all')}
+        />
       </div>
 
-      <div className="flex items-center gap-2 flex-wrap justify-between">
-        <div className="flex items-center gap-2 flex-1 min-w-[200px]">
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder={t('common.search')}
-            className="input flex-1"
-          />
-          <button
-            onClick={() => setFiltersOpen((o) => !o)}
-            title={t('orders.filters')}
-            aria-label={t('orders.filters')}
-            className={`flex-shrink-0 p-2 rounded-md border transition-colors ${filtersOpen ? 'bg-primary text-white border-primary' : 'border-gray-200 text-gray-500 hover:bg-gray-50'}`}
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h18M6 9h12M10 14h4" />
-            </svg>
-          </button>
-        </div>
-        <div className="flex items-center border border-gray-200 rounded-md overflow-hidden flex-shrink-0">
-          <button
-            onClick={() => setScope('inProgress')}
-            className={`px-3 py-1.5 text-sm transition-colors ${scope === 'inProgress' ? 'bg-primary text-white' : 'text-gray-500 hover:bg-gray-50'}`}
-          >
-            {t('orders.scopeInProgress')}
-          </button>
-          <button
-            onClick={() => setScope('alerts')}
-            className={`px-3 py-1.5 text-sm transition-colors ${scope === 'alerts' ? 'bg-primary text-white' : 'text-gray-500 hover:bg-gray-50'}`}
-          >
-            {t('orders.scopeAlerts')}
-          </button>
-          <button
-            onClick={() => setScope('all')}
-            className={`px-3 py-1.5 text-sm transition-colors ${scope === 'all' ? 'bg-primary text-white' : 'text-gray-500 hover:bg-gray-50'}`}
-          >
-            {t('orders.scopeAll')}
-          </button>
-        </div>
+      <div className="flex items-center gap-2">
+        <input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder={t('common.search')}
+          className="input flex-1"
+        />
+        <button
+          onClick={() => setFiltersOpen((o) => !o)}
+          title={t('orders.filters')}
+          aria-label={t('orders.filters')}
+          className={`flex-shrink-0 p-2 rounded-md border transition-colors ${filtersOpen ? 'bg-primary text-white border-primary' : 'border-gray-200 text-gray-500 hover:bg-gray-50'}`}
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h18M6 9h12M10 14h4" />
+          </svg>
+        </button>
       </div>
 
       {filtersOpen && (

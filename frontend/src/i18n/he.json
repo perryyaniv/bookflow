@@ -78,10 +78,7 @@
     "בוטל": "בוטל"
   },
   "dashboard": {
-    "title": "הזמנות",
-    "inProgress": "בתהליך",
-    "deliveredOrCancelled": "נסגרו",
-    "alarms": "התראות"
+    "title": "הזמנות"
   },
   "auditLog": {
     "title": "לוג שינויים",
