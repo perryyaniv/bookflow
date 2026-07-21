@@ -2,11 +2,13 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { changePassword } from '../api/auth';
+import { useAuth } from '../contexts/AuthContext';
 import Button from '../components/ui/Button';
 
 export default function ChangePassword() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { updateUser } = useAuth();
   const [newPassword, setNewPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [error, setError] = useState('');
@@ -20,6 +22,7 @@ export default function ChangePassword() {
     setLoading(true);
     try {
       await changePassword(newPassword);
+      updateUser({ forcePasswordChange: false });
       navigate('/');
     } catch {
       setError('שגיאה בשינוי הסיסמה');
