@@ -101,7 +101,7 @@ export default function OrderCard({ order, level, canWrite, onStatusChanged }: P
         <span className="label mb-0">{t('orders.orderDate')}</span>
         <span className="text-xs text-gray-700">{formatDate(order.orderDate)}</span>
 
-        <span className={`text-xs font-bold col-span-2 ${order.isPaid ? 'text-green-600' : 'text-red-500'}`}>
+        <span className={`text-xs font-bold col-span-2 ${order.isPaid ? 'text-green-600' : 'text-red-500 animate-breathe'}`}>
           {order.isPaid ? t('orders.paid') : t('orders.unpaid')}
         </span>
       </div>
