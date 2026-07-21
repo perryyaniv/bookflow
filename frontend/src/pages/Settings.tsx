@@ -156,12 +156,14 @@ function ThresholdsEditor() {
   const [settings, setSettings] = useState<AppSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [notOrdered, setNotOrdered] = useState('3');
   const [notArrived, setNotArrived] = useState('14');
   const [notCollected, setNotCollected] = useState('14');
 
   useEffect(() => {
     getSettings().then((s) => {
       setSettings(s);
+      setNotOrdered(String(s.notOrderedThresholdDays));
       setNotArrived(String(s.notArrivedThresholdDays));
       setNotCollected(String(s.notCollectedThresholdDays));
     }).finally(() => setLoading(false));
@@ -171,6 +173,7 @@ function ThresholdsEditor() {
     setSaving(true);
     try {
       const updated = await updateSettings({
+        notOrderedThresholdDays: Number(notOrdered) || 3,
         notArrivedThresholdDays: Number(notArrived) || 14,
         notCollectedThresholdDays: Number(notCollected) || 14,
       });
@@ -185,6 +188,10 @@ function ThresholdsEditor() {
 
   return (
     <div className="space-y-4 max-w-sm">
+      <div>
+        <label className="label">{t('settings.notOrderedThresholdDays')}</label>
+        <input type="number" min="1" value={notOrdered} onChange={(e) => setNotOrdered(e.target.value)} className="input" />
+      </div>
       <div>
         <label className="label">{t('settings.notArrivedThresholdDays')}</label>
         <input type="number" min="1" value={notArrived} onChange={(e) => setNotArrived(e.target.value)} className="input" />

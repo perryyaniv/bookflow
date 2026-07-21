@@ -50,7 +50,7 @@ export default function OrderDetail() {
   const [deleteModal, setDeleteModal] = useState(false);
   const [history, setHistory] = useState<AuditLogEntry[]>([]);
   const [liveAlert, setLiveAlert] = useState('');
-  const [thresholds, setThresholds] = useState({ notArrivedThresholdDays: 14, notCollectedThresholdDays: 14 });
+  const [thresholds, setThresholds] = useState({ notOrderedThresholdDays: 3, notArrivedThresholdDays: 14, notCollectedThresholdDays: 14 });
 
   const { showToast } = useToast();
   const isAdmin = user?.role === 'admin';
@@ -63,6 +63,7 @@ export default function OrderDetail() {
 
   useEffect(() => {
     getSettings().then((s) => setThresholds({
+      notOrderedThresholdDays: s.notOrderedThresholdDays,
       notArrivedThresholdDays: s.notArrivedThresholdDays,
       notCollectedThresholdDays: s.notCollectedThresholdDays,
     }));

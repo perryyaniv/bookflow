@@ -165,11 +165,14 @@ export default function OrderCard({ order, level, canWrite, onStatusChanged }: P
         )}
       </div>
 
-      <div className="flex items-center justify-between gap-2">
-        <span className={`text-xs font-bold ${order.isPaid ? 'text-primary' : 'text-red-500'}`}>
-          {order.isPaid ? t('orders.paid') : t('orders.unpaid')}
-        </span>
-      </div>
+      {order.isPaid && (
+        <div className="flex items-center justify-center gap-1.5">
+          <svg className="w-4 h-4 text-primary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+          </svg>
+          <span className="text-base font-extrabold text-primary">{t('orders.paid')}</span>
+        </div>
+      )}
 
       {order.items?.length > 0 && (
         <div className="mt-1.5 space-y-1">

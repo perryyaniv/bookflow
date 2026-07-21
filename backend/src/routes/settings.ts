@@ -19,8 +19,9 @@ router.get('/', asyncHandler<AuthRequest>(async (_req, res) => {
 
 router.put('/', requireRole('admin'), asyncHandler<AuthRequest>(async (req, res) => {
   const settings = await getOrCreateSettings();
-  const { orderSourceOptions, notArrivedThresholdDays, notCollectedThresholdDays } = req.body;
+  const { orderSourceOptions, notOrderedThresholdDays, notArrivedThresholdDays, notCollectedThresholdDays } = req.body;
   if (orderSourceOptions !== undefined) settings.orderSourceOptions = orderSourceOptions;
+  if (notOrderedThresholdDays !== undefined) settings.notOrderedThresholdDays = notOrderedThresholdDays;
   if (notArrivedThresholdDays !== undefined) settings.notArrivedThresholdDays = notArrivedThresholdDays;
   if (notCollectedThresholdDays !== undefined) settings.notCollectedThresholdDays = notCollectedThresholdDays;
   await settings.save();

@@ -56,7 +56,7 @@ export default function Dashboard() {
   const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [orders, setOrders] = useState<Order[]>([]);
-  const [thresholds, setThresholds] = useState({ notArrivedThresholdDays: 14, notCollectedThresholdDays: 14 });
+  const [thresholds, setThresholds] = useState({ notOrderedThresholdDays: 3, notArrivedThresholdDays: 14, notCollectedThresholdDays: 14 });
   const [scope, setScope] = useState<'inProgress' | 'all' | 'alerts'>('inProgress');
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [search, setSearch] = useState(searchParams.get('search') ?? '');
@@ -79,6 +79,7 @@ export default function Dashboard() {
       .then(([ordersRes, settings]) => {
         setOrders(ordersRes.data);
         setThresholds({
+          notOrderedThresholdDays: settings.notOrderedThresholdDays,
           notArrivedThresholdDays: settings.notArrivedThresholdDays,
           notCollectedThresholdDays: settings.notCollectedThresholdDays,
         });
@@ -94,7 +95,7 @@ export default function Dashboard() {
 
   const visibleOrders = useMemo(() => {
     if (scope === 'all') return orders;
-    if (scope === 'alerts') return orders.filter((o) => o.isNotArrived || o.isNotCollected);
+    if (scope === 'alerts') return orders.filter((o) => o.isNotOrdered || o.isNotArrived || o.isNotCollected);
     return orders.filter((o) => !HIDDEN_BY_DEFAULT_STATUSES.includes(o.status));
   }, [orders, scope]);
 
@@ -144,7 +145,7 @@ export default function Dashboard() {
     [orders]
   );
   const total = activeOrders.length;
-  const alarms = activeOrders.filter((o) => o.isNotArrived || o.isNotCollected).length;
+  const alarms = activeOrders.filter((o) => o.isNotOrdered || o.isNotArrived || o.isNotCollected).length;
   const totalPages = Math.max(1, Math.ceil(sortedRows.length / PAGE_SIZE));
   const pagedRows = sortedRows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 

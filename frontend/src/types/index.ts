@@ -46,6 +46,7 @@ export interface Order {
   updatedBy: string;
   createdAt: string;
   updatedAt: string;
+  isNotOrdered?: boolean;
   isNotArrived?: boolean;
   isNotCollected?: boolean;
 }
@@ -53,6 +54,7 @@ export interface Order {
 export interface AppSettings {
   _id: string;
   orderSourceOptions: string[];
+  notOrderedThresholdDays: number;
   notArrivedThresholdDays: number;
   notCollectedThresholdDays: number;
 }

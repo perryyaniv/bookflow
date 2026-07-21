@@ -4,7 +4,7 @@ import Order, { IOrderItem, ORDER_STATUSES, OrderStatus } from '../models/Order'
 import AppSettings from '../models/AppSettings';
 import { authenticate, requireRole, AuthRequest } from '../middleware/auth';
 import { logAudit } from '../utils/auditLogger';
-import { isNotArrived, isNotCollected } from '../utils/alerts';
+import { isNotOrdered, isNotArrived, isNotCollected } from '../utils/alerts';
 import { asyncHandler } from '../utils/asyncHandler';
 
 const ARRIVAL_ADVANCEABLE: OrderStatus[] = ['נוצר', 'הוזמן', 'הגיע חלקית', 'הגיע'];
@@ -79,6 +79,7 @@ function formatLogValue(field: string, value: unknown): string {
 async function getThresholds() {
   const settings = await AppSettings.findOne().lean();
   return {
+    notOrderedThresholdDays: settings?.notOrderedThresholdDays ?? 3,
     notArrivedThresholdDays: settings?.notArrivedThresholdDays ?? 14,
     notCollectedThresholdDays: settings?.notCollectedThresholdDays ?? 14,
   };
@@ -86,6 +87,7 @@ async function getThresholds() {
 
 function withAlerts<T extends {
   status: OrderStatus;
+  orderDate: Date;
   orderedAt?: Date | null;
   customerNotifiedAt?: Date | null;
   statusChangedAt?: Date | null;
@@ -93,11 +95,12 @@ function withAlerts<T extends {
   createdAt?: Date;
 }>(
   order: T,
-  thresholds: { notArrivedThresholdDays: number; notCollectedThresholdDays: number }
+  thresholds: { notOrderedThresholdDays: number; notArrivedThresholdDays: number; notCollectedThresholdDays: number }
 ) {
   return {
     ...order,
     statusChangedAt: order.statusChangedAt ?? order.updatedAt ?? order.createdAt,
+    isNotOrdered: isNotOrdered(order, thresholds.notOrderedThresholdDays),
     isNotArrived: isNotArrived(order, thresholds.notArrivedThresholdDays),
     isNotCollected: isNotCollected(order, thresholds.notCollectedThresholdDays),
   };

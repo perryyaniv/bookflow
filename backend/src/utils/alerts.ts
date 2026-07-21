@@ -4,6 +4,11 @@ export function daysSince(date: Date): number {
   return Math.floor((Date.now() - new Date(date).getTime()) / (1000 * 60 * 60 * 24));
 }
 
+export function isNotOrdered(order: Pick<IOrder, 'status' | 'orderDate'>, thresholdDays: number): boolean {
+  if (order.status !== 'נוצר') return false;
+  return daysSince(order.orderDate) >= thresholdDays;
+}
+
 export function isNotArrived(order: Pick<IOrder, 'status' | 'orderedAt'>, thresholdDays: number): boolean {
   if (!['הוזמן', 'הגיע חלקית'].includes(order.status) || !order.orderedAt) return false;
   return daysSince(order.orderedAt) >= thresholdDays;
