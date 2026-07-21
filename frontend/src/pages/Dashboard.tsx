@@ -43,7 +43,7 @@ export default function Dashboard() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [thresholds, setThresholds] = useState({ notArrivedThresholdDays: 14, notCollectedThresholdDays: 14 });
   const [view, setView] = useState<'cards' | 'table'>('cards');
-  const [scope, setScope] = useState<'inProgress' | 'all'>('inProgress');
+  const [scope, setScope] = useState<'inProgress' | 'all' | 'alerts'>('inProgress');
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [search, setSearch] = useState(searchParams.get('search') ?? '');
   const [statusFilter, setStatusFilter] = useState<OrderStatus | ''>('');
@@ -78,10 +78,11 @@ export default function Dashboard() {
     setOrders((prev) => prev.map((o) => (o._id === updated._id ? updated : o)));
   };
 
-  const visibleOrders = useMemo(
-    () => (scope === 'all' ? orders : orders.filter((o) => !HIDDEN_BY_DEFAULT_STATUSES.includes(o.status))),
-    [orders, scope]
-  );
+  const visibleOrders = useMemo(() => {
+    if (scope === 'all') return orders;
+    if (scope === 'alerts') return orders.filter((o) => o.isNotArrived || o.isNotCollected);
+    return orders.filter((o) => !HIDDEN_BY_DEFAULT_STATUSES.includes(o.status));
+  }, [orders, scope]);
 
   const rows = useMemo(
     () => visibleOrders.map((order) => ({
@@ -175,6 +176,12 @@ export default function Dashboard() {
             className={`px-3 py-1.5 text-sm transition-colors ${scope === 'all' ? 'bg-primary text-white' : 'text-gray-500 hover:bg-gray-50'}`}
           >
             {t('orders.scopeAll')}
+          </button>
+          <button
+            onClick={() => setScope('alerts')}
+            className={`px-3 py-1.5 text-sm transition-colors ${scope === 'alerts' ? 'bg-primary text-white' : 'text-gray-500 hover:bg-gray-50'}`}
+          >
+            {t('orders.scopeAlerts')}
           </button>
         </div>
         <div className="flex items-center border border-gray-200 rounded-md overflow-hidden flex-shrink-0">
