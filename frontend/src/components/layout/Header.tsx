@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
-import { ROLE_LABELS } from '../../utils/roles';
+import { ROLE_LABELS, hasWriteAccess } from '../../utils/roles';
 
 function usePageTitle() {
   const location = useLocation();
@@ -28,6 +28,7 @@ export default function Header() {
 
   const navItems = [
     { to: '/', label: t('dashboard.title'), show: true },
+    { to: '/orders/new', label: t('nav.addOrder'), show: hasWriteAccess(user?.role) },
     { to: '/audit-log', label: t('nav.auditLog'), show: isAdmin },
     { to: '/users', label: t('nav.userManagement'), show: isAdmin },
     { to: '/settings', label: t('nav.settings'), show: isAdmin },
