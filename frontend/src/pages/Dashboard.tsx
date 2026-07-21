@@ -141,8 +141,8 @@ export default function Dashboard() {
     <div className="space-y-4">
       <div className="grid grid-cols-3 gap-2">
         <StatCard label={t('dashboard.inProgress')} value={total} color="green" />
-        <StatCard label={t('dashboard.deliveredOrCancelled')} value={deliveredOrCancelled} color="gray" />
         <StatCard label={t('dashboard.alarms')} value={alarms} color="red" />
+        <StatCard label={t('dashboard.deliveredOrCancelled')} value={deliveredOrCancelled} color="gray" />
       </div>
 
       <div className="flex items-center gap-2 flex-wrap justify-between">
