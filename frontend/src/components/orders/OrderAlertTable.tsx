@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Order } from '../../types';
 import { AlertLevel } from '../../utils/alertLevel';
 import { formatDate } from '../../utils/date';
+import { StatusBadge } from '../ui/Badge';
 
 interface Row {
   order: Order;
@@ -43,9 +44,10 @@ export default function OrderAlertTable({ rows }: Props) {
           <tr>
             {th('', 'w-8')}
             {th(t('orders.customerName'))}
-            {th(t('orders.bookName'), 'hidden sm:table-cell')}
+            {th(t('orders.status'))}
+            {th(t('orders.bookName'))}
             {th(t('orders.isPaid'))}
-            {th(t('orders.lastStatusChange'), 'hidden sm:table-cell')}
+            {th(t('orders.lastStatusChange'))}
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-100">
@@ -59,13 +61,14 @@ export default function OrderAlertTable({ rows }: Props) {
                 <span className={`inline-block w-2.5 h-2.5 rounded-full ${LEVEL_DOT[level]}`} />
               </td>
               <td className="px-4 py-3 font-medium text-gray-900">{order.customerName}</td>
-              <td className="px-4 py-3 text-gray-600 hidden sm:table-cell">{bookNames(order)}</td>
+              <td className="px-4 py-3"><StatusBadge status={order.status} /></td>
+              <td className="px-4 py-3 text-gray-600">{bookNames(order)}</td>
               <td className="px-4 py-3">
                 <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${order.isPaid ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}>
                   {order.isPaid ? t('orders.paid') : t('orders.unpaid')}
                 </span>
               </td>
-              <td className="px-4 py-3 text-gray-600 whitespace-nowrap hidden sm:table-cell">
+              <td className="px-4 py-3 text-gray-600 whitespace-nowrap">
                 {formatDate(order.statusChangedAt)}
               </td>
             </tr>
