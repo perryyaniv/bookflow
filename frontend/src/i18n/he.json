@@ -1,7 +1,6 @@
 {
   "nav": {
     "dashboard": "בית",
-    "orders": "הזמנות",
     "addOrder": "הזמנה חדשה",
     "auditLog": "לוג שינויים",
     "userManagement": "ניהול משתמשים",
@@ -48,17 +47,16 @@
     "cancel": "ביטול",
     "delete": "מחיקה",
     "edit": "עריכה",
-    "noResults": "לא נמצאו הזמנות",
     "cardsView": "כרטיסיות",
     "tableView": "טבלה",
-    "filters": "סינון",
-    "clearFilters": "נקה סינון",
     "deleteConfirm": "האם אתה בטוח שברצונך למחוק הזמנה זו?",
     "page": "עמוד",
     "of": "מתוך",
     "notArrived": "לא הגיע",
     "notCollected": "לא נאסף",
-    "invalidPhone": "מספר טלפון לא תקין"
+    "invalidPhone": "מספר טלפון לא תקין",
+    "lastStatusChange": "שינוי סטטוס אחרון",
+    "noResultsSearch": "לא נמצאו הזמנות התואמות לחיפוש"
   },
   "status": {
     "נוצר": "נוצר",
@@ -70,15 +68,9 @@
     "בוטל": "בוטל"
   },
   "dashboard": {
-    "title": "לוח בקרה",
+    "title": "הזמנות",
     "totalOrders": "סה\"כ הזמנות",
-    "openOrders": "הזמנות פתוחות",
-    "inProgress": "בתהליך",
-    "alarms": "התראות",
-    "notArrived": "לא הגיעו",
-    "notCollected": "לא נאספו",
-    "urgentNotArrived": "הזמנות שלא הגיעו",
-    "urgentNotCollected": "הזמנות שלא נאספו"
+    "alarms": "התראות"
   },
   "auditLog": {
     "title": "לוג שינויים",

@@ -8,7 +8,6 @@ function usePageTitle() {
   const { t } = useTranslation();
   const path = location.pathname;
   if (path === '/') return t('dashboard.title');
-  if (path === '/orders') return t('nav.orders');
   if (path === '/orders/new') return t('nav.addOrder');
   if (path.startsWith('/orders/')) return t('orders.details');
   if (path === '/audit-log') return t('nav.auditLog');
@@ -30,7 +29,6 @@ export default function Header() {
 
   const navItems = [
     { to: '/', label: t('dashboard.title'), show: true },
-    { to: '/orders', label: t('nav.orders'), show: true },
     { to: '/audit-log', label: t('nav.auditLog'), show: isAdmin },
     { to: '/users', label: t('nav.userManagement'), show: isAdmin },
     { to: '/settings', label: t('nav.settings'), show: isAdmin },
@@ -46,7 +44,7 @@ export default function Header() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (search.trim()) {
-      navigate(`/orders?search=${encodeURIComponent(search.trim())}`);
+      navigate(`/?search=${encodeURIComponent(search.trim())}`);
       setSearch('');
     }
   };

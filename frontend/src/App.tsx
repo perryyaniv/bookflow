@@ -4,7 +4,6 @@ import Layout from './components/layout/Layout';
 import Login from './pages/Login';
 import ChangePassword from './pages/ChangePassword';
 import Dashboard from './pages/Dashboard';
-import Orders from './pages/Orders';
 import OrderDetail from './pages/OrderDetail';
 import NewOrder from './pages/NewOrder';
 import AuditLog from './pages/AuditLog';
@@ -37,7 +36,7 @@ export default function App() {
           element={<RequireAuth><Layout /></RequireAuth>}
         >
           <Route index element={<Dashboard />} />
-          <Route path="orders" element={<Orders />} />
+          <Route path="orders" element={<Navigate to="/" replace />} />
           <Route path="orders/new" element={<NewOrder />} />
           <Route path="orders/:id" element={<OrderDetail />} />
           <Route path="audit-log" element={

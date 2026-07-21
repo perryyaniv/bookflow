@@ -36,6 +36,7 @@ export interface IOrder extends Document {
   status: OrderStatus;
   orderedAt?: Date | null;
   customerNotifiedAt?: Date | null;
+  statusChangedAt: Date;
   notes?: string;
   createdBy: mongoose.Types.ObjectId;
   updatedBy: mongoose.Types.ObjectId;
@@ -65,6 +66,7 @@ const OrderSchema = new Schema<IOrder>(
     status: { type: String, enum: ORDER_STATUSES, default: 'נוצר' },
     orderedAt: { type: Date, default: null },
     customerNotifiedAt: { type: Date, default: null },
+    statusChangedAt: { type: Date, default: Date.now },
     notes: { type: String, default: '' },
     createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     updatedBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },

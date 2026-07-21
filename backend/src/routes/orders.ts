@@ -127,6 +127,7 @@ router.put('/:id', asyncHandler<AuthRequest>(async (req, res) => {
   if (newStatus && newStatus !== existing.status) {
     if (newStatus === 'הוזמן' && !existing.orderedAt) update.orderedAt = new Date();
     if (newStatus === 'הלקוח עודכן' && !existing.customerNotifiedAt) update.customerNotifiedAt = new Date();
+    update.statusChangedAt = new Date();
   }
 
   const io: Server = req.app.get('io');
@@ -174,6 +175,7 @@ router.patch('/:id/status', asyncHandler<AuthRequest>(async (req, res) => {
   if (status === 'הוזמן' && !existing.orderedAt) existing.orderedAt = new Date();
   if (status === 'הגיע') existing.items.forEach((i) => { i.arrived = true; });
   if (status === 'הלקוח עודכן' && !existing.customerNotifiedAt) existing.customerNotifiedAt = new Date();
+  if (status !== oldStatus) existing.statusChangedAt = new Date();
   await existing.save();
 
   const populated = await Order.findById(existing._id).populate('branchId', 'name').lean();
@@ -215,6 +217,7 @@ router.patch('/:id/items/:index/arrived', asyncHandler<AuthRequest>(async (req, 
   existing.status = newStatus;
   existing.updatedBy = req.user!.userId as never;
   if ((newStatus === 'הגיע' || newStatus === 'הגיע חלקית') && !existing.orderedAt) existing.orderedAt = new Date();
+  if (newStatus !== oldStatus) existing.statusChangedAt = new Date();
   await existing.save();
 
   await logAudit({

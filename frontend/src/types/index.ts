@@ -39,6 +39,7 @@ export interface Order {
   status: OrderStatus;
   orderedAt?: string | null;
   customerNotifiedAt?: string | null;
+  statusChangedAt: string;
   notes?: string;
   items: OrderItem[];
   createdBy: string;
