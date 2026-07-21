@@ -26,6 +26,7 @@
     "customerName": "שם הלקוח",
     "customerPhone": "טלפון",
     "branch": "סניף",
+    "orderedFromBranch": "הוזמן מסניף",
     "orderDate": "תאריך הזמנה",
     "orderedFrom": "הוזמן מ",
     "isPaid": "שולם",

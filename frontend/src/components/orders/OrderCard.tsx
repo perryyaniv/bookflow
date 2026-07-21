@@ -182,7 +182,7 @@ export default function OrderCard({ order, level, canWrite, onStatusChanged }: P
       {expanded && (
         <div className="mt-2 pt-3 border-t border-gray-100 space-y-3" onClick={(e) => e.stopPropagation()}>
           <div className="grid grid-cols-2 gap-x-3 gap-y-1.5">
-            <span className="label mb-0">{t('orders.branch')}</span>
+            <span className="label mb-0">{t('orders.orderedFromBranch')}</span>
             <span className="text-xs text-gray-700 font-medium">{order.branchId?.name ?? '—'}</span>
 
             <span className="label mb-0">{t('orders.orderedFrom')}</span>
