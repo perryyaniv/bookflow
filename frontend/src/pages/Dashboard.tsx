@@ -43,6 +43,7 @@ export default function Dashboard() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [thresholds, setThresholds] = useState({ notArrivedThresholdDays: 14, notCollectedThresholdDays: 14 });
   const [view, setView] = useState<'cards' | 'table'>('cards');
+  const [scope, setScope] = useState<'inProgress' | 'all'>('inProgress');
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [search, setSearch] = useState(searchParams.get('search') ?? '');
   const [statusFilter, setStatusFilter] = useState<OrderStatus | ''>('');
@@ -71,17 +72,15 @@ export default function Dashboard() {
       .finally(() => setLoading(false));
   }, []);
 
-  useEffect(() => { setPage(1); }, [search, statusFilter, alertFilter, paidFilter, customerFilter]);
+  useEffect(() => { setPage(1); }, [search, statusFilter, alertFilter, paidFilter, customerFilter, scope]);
 
   const handleStatusChanged = (updated: Order) => {
     setOrders((prev) => prev.map((o) => (o._id === updated._id ? updated : o)));
   };
 
   const visibleOrders = useMemo(
-    () => (HIDDEN_BY_DEFAULT_STATUSES.includes(statusFilter as OrderStatus)
-      ? orders
-      : orders.filter((o) => !HIDDEN_BY_DEFAULT_STATUSES.includes(o.status))),
-    [orders, statusFilter]
+    () => (scope === 'all' ? orders : orders.filter((o) => !HIDDEN_BY_DEFAULT_STATUSES.includes(o.status))),
+    [orders, scope]
   );
 
   const rows = useMemo(
@@ -166,6 +165,20 @@ export default function Dashboard() {
         </div>
         <div className="flex items-center border border-gray-200 rounded-md overflow-hidden flex-shrink-0">
           <button
+            onClick={() => setScope('inProgress')}
+            className={`px-3 py-1.5 text-sm transition-colors ${scope === 'inProgress' ? 'bg-primary text-white' : 'text-gray-500 hover:bg-gray-50'}`}
+          >
+            {t('orders.scopeInProgress')}
+          </button>
+          <button
+            onClick={() => setScope('all')}
+            className={`px-3 py-1.5 text-sm transition-colors ${scope === 'all' ? 'bg-primary text-white' : 'text-gray-500 hover:bg-gray-50'}`}
+          >
+            {t('orders.scopeAll')}
+          </button>
+        </div>
+        <div className="flex items-center border border-gray-200 rounded-md overflow-hidden flex-shrink-0">
+          <button
             onClick={() => setView('cards')}
             className={`px-3 py-1.5 text-sm transition-colors ${view === 'cards' ? 'bg-primary text-white' : 'text-gray-500 hover:bg-gray-50'}`}
           >
@@ -225,9 +238,7 @@ export default function Dashboard() {
             </svg>
           </div>
           <h2 className="text-lg font-semibold text-gray-700">
-            {(search || statusFilter || alertFilter || paidFilter || customerFilter)
-              ? t('orders.noResultsSearch')
-              : 'אין הזמנות עדיין'}
+            {orders.length === 0 ? 'אין הזמנות עדיין' : t('orders.noResultsSearch')}
           </h2>
         </div>
       ) : (

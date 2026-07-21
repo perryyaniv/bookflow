@@ -50,6 +50,8 @@
     "cardsView": "כרטיסיות",
     "tableView": "טבלה",
     "filters": "סינון",
+    "scopeInProgress": "בתהליך",
+    "scopeAll": "כל ההזמנות",
     "deleteConfirm": "האם אתה בטוח שברצונך למחוק הזמנה זו?",
     "page": "עמוד",
     "of": "מתוך",
