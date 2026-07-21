@@ -109,7 +109,7 @@ export default function OrderCard({ order, level, canWrite, onStatusChanged }: P
       {order.items?.length > 0 && (
         <div className="mt-2 flex flex-wrap gap-1">
           {order.items.slice(0, 3).map((it, idx) => (
-            <span key={idx} className={`text-xs px-2 py-0.5 rounded-full truncate max-w-[16rem] border ${it.arrived ? 'bg-status-partial/10 text-status-partial border-status-partial/30' : 'bg-primary/8 text-primary border-primary/20'}`}>
+            <span key={idx} className={`text-xs px-2 py-0.5 rounded-full truncate max-w-[16rem] border text-gray-900 ${it.arrived ? 'bg-green-100 border-green-300' : 'bg-primary/8 border-primary/20'}`}>
               {it.bookName}{it.sku ? ` · ${t('orders.sku')}: ${it.sku}` : ''} ×{it.quantity}
             </span>
           ))}
