@@ -46,6 +46,7 @@ export default function OrderForm({ initial, onSubmit, onCancel, loading, isEdit
   const [form, setForm] = useState<FormData>(toForm(initial));
   const [branches, setBranches] = useState<Branch[]>([]);
   const [orderSources, setOrderSources] = useState<string[]>([]);
+  const [step, setStep] = useState<1 | 2>(1);
 
   useEffect(() => {
     Promise.all([getBranches(), getSettings()]).then(([branchList, settings]) => {
@@ -69,8 +70,16 @@ export default function OrderForm({ initial, onSubmit, onCancel, loading, isEdit
   const removeItem = (index: number) =>
     setForm((f) => ({ ...f, items: f.items.filter((_, i) => i !== index) }));
 
+  const phoneValid = isValidIsraeliPhone(form.customerPhone);
+  const step1Valid = !!form.customerName && phoneValid && !!form.branchId && !!form.orderedFrom;
+  const canSubmit = step1Valid && form.items.some((it) => it.bookName.trim());
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isEdit && step === 1) {
+      setStep(2);
+      return;
+    }
     const payload: Record<string, unknown> = {
       ...form,
       items: form.items
@@ -85,11 +94,18 @@ export default function OrderForm({ initial, onSubmit, onCancel, loading, isEdit
     <div><label className="label">{label}</label>{children}</div>
   );
 
-  const phoneValid = isValidIsraeliPhone(form.customerPhone);
-  const canSubmit = !!form.customerName && phoneValid && !!form.branchId && !!form.orderedFrom && form.items.some((it) => it.bookName.trim());
-
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {!isEdit && (
+        <div className="flex items-center gap-2 text-xs font-semibold">
+          <span className={step === 1 ? 'text-primary' : 'text-gray-400'}>1. {t('orders.details')}</span>
+          <span className="text-gray-300">›</span>
+          <span className={step === 2 ? 'text-primary' : 'text-gray-400'}>2. {t('orders.items')}</span>
+        </div>
+      )}
+
+      {(isEdit || step === 1) && (
+      <>
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
         {field(t('orders.customerName') + ' *', (
           <input required value={form.customerName} onChange={(e) => set('customerName', e.target.value)} className={inputCls} />
@@ -137,7 +153,11 @@ export default function OrderForm({ initial, onSubmit, onCancel, loading, isEdit
         />
         <label htmlFor="isPaid" className="text-sm text-gray-700">{t('orders.isPaid')}</label>
       </div>
+      </>
+      )}
 
+      {(isEdit || step === 2) && (
+      <>
       <div>
         <label className="label">{t('orders.items')}</label>
         <div className="space-y-2">
@@ -205,10 +225,19 @@ export default function OrderForm({ initial, onSubmit, onCancel, loading, isEdit
           className={inputCls + ' resize-none'}
         />
       ))}
+      </>
+      )}
 
       <div className="flex gap-3 justify-end pt-2 border-t border-gray-100">
+        {!isEdit && step === 2 && (
+          <Button type="button" variant="secondary" onClick={() => setStep(1)}>{t('common.back')}</Button>
+        )}
         <Button type="button" variant="secondary" onClick={onCancel}>{t('common.cancel')}</Button>
-        <Button type="submit" loading={loading} disabled={!canSubmit}>{t('common.save')}</Button>
+        {!isEdit && step === 1 ? (
+          <Button type="submit" disabled={!step1Valid}>{t('common.next')}</Button>
+        ) : (
+          <Button type="submit" loading={loading} disabled={!canSubmit}>{t('common.save')}</Button>
+        )}
       </div>
     </form>
   );
