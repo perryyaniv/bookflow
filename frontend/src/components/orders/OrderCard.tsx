@@ -122,7 +122,7 @@ export default function OrderCard({ order, level, canWrite, onStatusChanged }: P
                 <span>×{it.quantity}</span>
                 {it.arrived
                   ? <span className="text-green-600 font-semibold">{t('orders.arrived')} ✓</span>
-                  : <span className="text-gray-400">—</span>}
+                  : <span className="text-amber-600 font-semibold">{t('orders.pending')}</span>}
               </span>
             </div>
           ))}

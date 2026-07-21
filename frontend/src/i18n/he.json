@@ -37,6 +37,7 @@
     "sku": "מק\"ט",
     "quantity": "כמות",
     "arrived": "הגיע",
+    "pending": "בהמתנה",
     "addItem": "הוספת ספר",
     "notes": "הערות",
     "orderedAt": "תאריך הזמנה מהספק",
