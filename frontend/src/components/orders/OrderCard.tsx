@@ -33,6 +33,16 @@ const NEXT_STATUS: Partial<Record<OrderStatus, OrderStatus>> = {
 
 const JUMPABLE_STATUSES = ORDER_STATUSES.filter((s) => s !== 'בוטל');
 
+const STATUS_ACCENT_BORDER: Record<OrderStatus, string> = {
+  'נוצר': 'border-r-status-created',
+  'הוזמן': 'border-r-status-ordered',
+  'הגיע חלקית': 'border-r-status-partial',
+  'הגיע': 'border-r-status-arrived',
+  'הלקוח עודכן': 'border-r-status-notified',
+  'נאסף': 'border-r-status-collected',
+  'בוטל': 'border-r-status-cancelled',
+};
+
 export default function OrderCard({ order, level, canWrite, onStatusChanged }: Props) {
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -83,7 +93,7 @@ export default function OrderCard({ order, level, canWrite, onStatusChanged }: P
   return (
     <div
       onClick={() => setExpanded((e) => !e)}
-      className="card cursor-pointer hover:shadow-md hover:border-r-primary-dark transition-all group flex flex-col"
+      className={`card cursor-pointer hover:shadow-md transition-all group flex flex-col ${STATUS_ACCENT_BORDER[order.status]}`}
     >
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="flex-1 min-w-0">
