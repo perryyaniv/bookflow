@@ -190,6 +190,12 @@ export default function OrderCard({ order, level, canWrite, onStatusChanged }: P
 
             <span className="label mb-0">{t('orders.orderedFrom')}</span>
             <span className="text-xs text-gray-700">{order.orderedFrom || '—'}</span>
+
+            <span className="label mb-0">{t('orders.orderedAt')}</span>
+            <span className="text-xs text-gray-700">{formatDate(order.orderedAt)}</span>
+
+            <span className="label mb-0">{t('orders.customerNotifiedAt')}</span>
+            <span className="text-xs text-gray-700">{formatDate(order.customerNotifiedAt)}</span>
           </div>
 
           {order.status === 'הגיע חלקית' && (
@@ -210,10 +216,13 @@ export default function OrderCard({ order, level, canWrite, onStatusChanged }: P
           onClick={(e) => e.stopPropagation()}
         >
           <button
-            onClick={(e) => { e.stopPropagation(); navigate(`/orders/${order._id}`); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(canWrite ? `/orders/${order._id}?edit=1` : `/orders/${order._id}`);
+            }}
             className="flex-1 min-w-0 px-3 py-1.5 rounded-md text-xs font-semibold text-white bg-primary hover:bg-primary-dark transition-colors truncate"
           >
-            {t('orders.details')}
+            {canWrite ? t('orders.edit') : t('orders.details')}
           </button>
           {!isTerminal && canWrite && (
             <button

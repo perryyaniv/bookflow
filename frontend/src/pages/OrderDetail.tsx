@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getOrder, updateOrder, deleteOrder, setItemArrived } from '../api/orders';
 import { getSettings } from '../api/settings';
@@ -38,11 +38,12 @@ function DetailRow({ label, value }: { label: string; value: React.ReactNode }) 
 export default function OrderDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { t } = useTranslation();
   const { user } = useAuth();
   const [order, setOrder] = useState<Order | null>(null);
   const [tab, setTab] = useState<Tab>('details');
-  const [editing, setEditing] = useState(false);
+  const [editing, setEditing] = useState(() => hasWriteAccess(user?.role) && searchParams.get('edit') === '1');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
