@@ -112,9 +112,24 @@ export default function OrderCard({ order, level, canWrite, onStatusChanged }: P
       </div>
 
       {order.items?.length > 0 && (
-        <p className="mt-1.5 text-xs text-gray-600 truncate">
-          {order.items.map((it) => it.bookName).join(', ')}
-        </p>
+        <div className="mt-1.5 space-y-1">
+          {(expanded ? order.items : order.items.slice(0, 3)).map((it, idx) => (
+            <div key={idx} className="flex items-center justify-between gap-2 text-xs bg-gray-50 rounded px-2 py-1.5">
+              <span className="truncate text-gray-800">
+                {it.bookName}{it.sku ? ` · ${t('orders.sku')}: ${it.sku}` : ''}
+              </span>
+              <span className="flex items-center gap-2 flex-shrink-0 text-gray-500">
+                <span>×{it.quantity}</span>
+                {it.arrived
+                  ? <span className="text-green-600 font-semibold">{t('orders.arrived')} ✓</span>
+                  : <span className="text-gray-400">—</span>}
+              </span>
+            </div>
+          ))}
+          {!expanded && order.items.length > 3 && (
+            <p className="text-xs text-gray-400 px-1">+{order.items.length - 3} נוספים</p>
+          )}
+        </div>
       )}
 
       <div className="flex items-center justify-center mt-1.5 text-gray-300 group-hover:text-primary transition-colors">
@@ -135,24 +150,6 @@ export default function OrderCard({ order, level, canWrite, onStatusChanged }: P
             <span className="label mb-0">{t('orders.orderedFrom')}</span>
             <span className="text-xs text-gray-700">{order.orderedFrom || '—'}</span>
           </div>
-
-          {order.items?.length > 0 && (
-            <div className="space-y-1">
-              {order.items.map((it, idx) => (
-                <div key={idx} className="flex items-center justify-between gap-2 text-xs bg-gray-50 rounded px-2 py-1.5">
-                  <span className="truncate text-gray-800">
-                    {it.bookName}{it.sku ? ` · ${t('orders.sku')}: ${it.sku}` : ''}
-                  </span>
-                  <span className="flex items-center gap-2 flex-shrink-0 text-gray-500">
-                    <span>×{it.quantity}</span>
-                    {it.arrived
-                      ? <span className="text-green-600 font-semibold">{t('orders.arrived')} ✓</span>
-                      : <span className="text-gray-400">—</span>}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
 
           {order.status === 'הגיע חלקית' && (
             <p className="text-xs font-medium text-status-partial">
