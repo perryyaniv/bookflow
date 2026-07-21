@@ -123,7 +123,7 @@ export default function OrderCard({ order, level, canWrite, onStatusChanged }: P
             {menuOpen && (
               <>
                 <div className="fixed inset-0 z-10" onClick={(e) => { e.stopPropagation(); setMenuOpen(false); }} />
-                <div className="absolute top-full mt-1 right-0 z-20 bg-white border border-gray-200 rounded-md shadow-lg py-1 w-40 max-h-56 overflow-y-auto">
+                <div className="absolute top-full mt-1 left-0 z-20 bg-white border border-gray-200 rounded-md shadow-lg py-1 w-40 max-h-56 overflow-y-auto">
                   {JUMPABLE_STATUSES.map((s) => (
                     <button
                       key={s}
