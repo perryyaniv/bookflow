@@ -130,6 +130,7 @@ export default function Dashboard() {
     [orders]
   );
   const total = activeOrders.length;
+  const deliveredOrCancelled = orders.filter((o) => HIDDEN_BY_DEFAULT_STATUSES.includes(o.status)).length;
   const alarms = activeOrders.filter((o) => o.isNotArrived || o.isNotCollected).length;
   const totalPages = Math.max(1, Math.ceil(sortedRows.length / PAGE_SIZE));
   const pagedRows = sortedRows.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
@@ -138,8 +139,9 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-2">
-        <StatCard label={t('dashboard.totalOrders')} value={total} color="green" />
+      <div className="grid grid-cols-3 gap-2">
+        <StatCard label={t('dashboard.inProgress')} value={total} color="green" />
+        <StatCard label={t('dashboard.deliveredOrCancelled')} value={deliveredOrCancelled} color="gray" />
         <StatCard label={t('dashboard.alarms')} value={alarms} color="red" />
       </div>
 

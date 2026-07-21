@@ -77,7 +77,8 @@
   },
   "dashboard": {
     "title": "הזמנות",
-    "totalOrders": "סה\"כ הזמנות",
+    "inProgress": "בתהליך",
+    "deliveredOrCancelled": "נמסרו/בוטלו",
     "alarms": "התראות"
   },
   "auditLog": {
