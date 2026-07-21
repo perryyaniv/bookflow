@@ -110,7 +110,7 @@ export default function OrderCard({ order, level, canWrite, onStatusChanged }: P
       className={`card cursor-pointer hover:shadow-md transition-all group flex flex-col ${STATUS_ACCENT_BORDER[order.status]}`}
     >
       {order.isPaid && (
-        <div className="flex items-center justify-center gap-1.5 mb-2">
+        <div className="flex items-center justify-start gap-1.5 mb-2">
           <svg className="w-4 h-4 text-primary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
           </svg>
