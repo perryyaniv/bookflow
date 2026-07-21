@@ -1,3 +1,4 @@
+import { TFunction } from 'i18next';
 import { Order } from '../types';
 
 export type AlertLevel = 'red' | 'yellow' | 'green';
@@ -30,4 +31,11 @@ export function getAlertLevel(
     if (daysSince(order.customerNotifiedAt) >= thresholds.notCollectedThresholdDays * YELLOW_RATIO) return 'yellow';
   }
   return 'green';
+}
+
+export function getAlertText(order: Order, level: AlertLevel, t: TFunction): string | null {
+  if (level === 'green') return null;
+  if (level === 'red') return order.isNotArrived ? t('orders.notArrived') : t('orders.notCollected');
+  const isArrivedType = order.status === 'הוזמן' || order.status === 'הגיע חלקית';
+  return isArrivedType ? t('orders.approachingNotArrived') : t('orders.approachingNotCollected');
 }

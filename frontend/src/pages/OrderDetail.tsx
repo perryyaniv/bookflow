@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getOrder, updateOrder, deleteOrder, setItemArrived } from '../api/orders';
+import { getSettings } from '../api/settings';
 import { Order } from '../types';
 import { StatusBadge } from '../components/ui/Badge';
 import OrderForm from '../components/orders/OrderForm';
@@ -14,6 +15,13 @@ import { getAuditLog } from '../api/auditLog';
 import { AuditLogEntry } from '../types';
 import { io } from 'socket.io-client';
 import { formatDate, formatDateTime } from '../utils/date';
+import { AlertLevel, getAlertLevel, getAlertText } from '../utils/alertLevel';
+
+const ALERT_ICON_COLOR: Record<AlertLevel, string> = {
+  red: 'text-red-600',
+  yellow: 'text-amber-600',
+  green: '',
+};
 
 type Tab = 'details' | 'history';
 
@@ -39,6 +47,7 @@ export default function OrderDetail() {
   const [deleteModal, setDeleteModal] = useState(false);
   const [history, setHistory] = useState<AuditLogEntry[]>([]);
   const [liveAlert, setLiveAlert] = useState('');
+  const [thresholds, setThresholds] = useState({ notArrivedThresholdDays: 14, notCollectedThresholdDays: 14 });
 
   const { showToast } = useToast();
   const isAdmin = user?.role === 'admin';
@@ -47,6 +56,13 @@ export default function OrderDetail() {
     if (!id) return;
     getOrder(id).then(setOrder).finally(() => setLoading(false));
   }, [id]);
+
+  useEffect(() => {
+    getSettings().then((s) => setThresholds({
+      notArrivedThresholdDays: s.notArrivedThresholdDays,
+      notCollectedThresholdDays: s.notCollectedThresholdDays,
+    }));
+  }, []);
 
   useEffect(() => {
     if (!order?.branchId?._id) return;
@@ -95,6 +111,9 @@ export default function OrderDetail() {
   if (loading) return <Spinner />;
   if (!order) return <div className="text-center py-16 text-gray-400">הזמנה לא נמצאה</div>;
 
+  const alertLevel = getAlertLevel(order, thresholds);
+  const alertMsg = getAlertText(order, alertLevel, t);
+
   const TABS: { key: Tab; label: string }[] = [
     { key: 'details', label: t('orders.details') },
     ...(isAdmin ? [{ key: 'history' as Tab, label: t('orders.history') }] : []),
@@ -121,6 +140,14 @@ export default function OrderDetail() {
             </button>
             <h1 className="text-lg sm:text-xl font-bold text-dark truncate">{order.customerName}</h1>
             <StatusBadge status={order.status} />
+            {alertMsg && (
+              <span className={`flex items-center gap-1 text-xs font-bold flex-shrink-0 ${ALERT_ICON_COLOR[alertLevel]}`}>
+                <svg className="w-4 h-4 flex-shrink-0 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                </svg>
+                {alertMsg}
+              </span>
+            )}
           </div>
           <p className="text-xs text-gray-400 mr-7">{order.customerPhone}</p>
         </div>

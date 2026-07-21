@@ -1,9 +1,8 @@
 import { useState } from 'react';
-import { TFunction } from 'i18next';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Order, OrderStatus } from '../../types';
-import { AlertLevel } from '../../utils/alertLevel';
+import { AlertLevel, getAlertText } from '../../utils/alertLevel';
 import { StatusBadge } from '../ui/Badge';
 import { formatDate } from '../../utils/date';
 import { changeOrderStatus } from '../../api/orders';
@@ -23,13 +22,6 @@ const ALERT_TEXT_COLOR: Record<AlertLevel, string> = {
   green: '',
 };
 
-function alertText(order: Order, level: AlertLevel, t: TFunction): string | null {
-  if (level === 'green') return null;
-  if (level === 'red') return order.isNotArrived ? t('orders.notArrived') : t('orders.notCollected');
-  const isArrivedType = order.status === 'הוזמן' || order.status === 'הגיע חלקית';
-  return isArrivedType ? t('orders.approachingNotArrived') : t('orders.approachingNotCollected');
-}
-
 const NEXT_STATUS: Partial<Record<OrderStatus, OrderStatus>> = {
   'נוצר': 'הוזמן',
   'הוזמן': 'הגיע',
@@ -47,7 +39,7 @@ export default function OrderCard({ order, level, onStatusChanged }: Props) {
 
   const nextStatus = NEXT_STATUS[order.status];
   const isTerminal = order.status === 'נאסף' || order.status === 'בוטל';
-  const alertMsg = alertText(order, level, t);
+  const alertMsg = getAlertText(order, level, t);
 
   const doStatusChange = async (status: OrderStatus) => {
     setChanging(true);
@@ -88,7 +80,7 @@ export default function OrderCard({ order, level, onStatusChanged }: Props) {
             </h3>
             {alertMsg && (
               <span className={`flex items-center gap-1 font-bold text-xs leading-tight flex-shrink-0 ${ALERT_TEXT_COLOR[level]}`}>
-                <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3.5 h-3.5 flex-shrink-0 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
                 </svg>
                 {alertMsg}
