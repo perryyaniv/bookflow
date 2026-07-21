@@ -35,13 +35,13 @@ export default {
         nav: '0 2px 8px 0 rgba(31,111,92,0.15)',
       },
       keyframes: {
-        blink: {
-          '0%, 49%': { opacity: '1' },
-          '50%, 100%': { opacity: '0' },
+        breathe: {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0.25' },
         },
       },
       animation: {
-        blink: 'blink 1s steps(1) infinite',
+        breathe: 'breathe 1.6s ease-in-out infinite',
       },
     },
   },
