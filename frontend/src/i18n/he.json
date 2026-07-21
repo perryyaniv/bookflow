@@ -80,7 +80,7 @@
   "dashboard": {
     "title": "הזמנות",
     "inProgress": "בתהליך",
-    "deliveredOrCancelled": "טופלו",
+    "deliveredOrCancelled": "נסגרו",
     "alarms": "התראות"
   },
   "auditLog": {
