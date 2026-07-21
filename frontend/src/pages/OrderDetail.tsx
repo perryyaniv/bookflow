@@ -97,7 +97,7 @@ export default function OrderDetail() {
 
   const TABS: { key: Tab; label: string }[] = [
     { key: 'details', label: t('orders.details') },
-    { key: 'history', label: t('orders.history') },
+    ...(isAdmin ? [{ key: 'history' as Tab, label: t('orders.history') }] : []),
   ];
 
   return (
