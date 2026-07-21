@@ -110,7 +110,7 @@ export default function UserManagement() {
                 </td>
                 <td className="px-4 py-3 text-gray-600">{branchName(u)}</td>
                 <td className="px-4 py-3">
-                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${u.active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${u.active ? 'bg-primary/10 text-primary' : 'bg-gray-100 text-gray-500'}`}>
                     {u.active ? 'פעיל' : 'לא פעיל'}
                   </span>
                 </td>

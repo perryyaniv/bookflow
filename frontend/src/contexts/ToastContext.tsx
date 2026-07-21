@@ -44,7 +44,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   };
 
   const colors = {
-    success: 'bg-green-600',
+    success: 'bg-primary',
     error: 'bg-red-600',
     info: 'bg-primary',
   };

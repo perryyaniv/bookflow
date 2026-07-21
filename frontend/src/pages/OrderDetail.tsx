@@ -195,7 +195,7 @@ export default function OrderDetail() {
                   <DetailRow label={t('orders.orderedFrom')} value={order.orderedFrom} />
                   <DetailRow label={t('orders.status')} value={<StatusBadge status={order.status} />} />
                   <DetailRow label={t('orders.isPaid')} value={
-                    <span className={`font-bold ${order.isPaid ? 'text-green-600' : 'text-red-500 animate-breathe'}`}>
+                    <span className={`font-bold ${order.isPaid ? 'text-primary' : 'text-red-500 animate-breathe'}`}>
                       {order.isPaid ? t('orders.paid') : t('orders.unpaid')}
                     </span>
                   } />
@@ -218,7 +218,7 @@ export default function OrderDetail() {
                     </thead>
                     <tbody className="divide-y divide-gray-50">
                       {order.items.map((it, idx) => (
-                        <tr key={idx} className={it.arrived ? 'bg-green-50/50' : undefined}>
+                        <tr key={idx} className={it.arrived ? 'bg-primary/5' : undefined}>
                           <td className="px-3 py-2 text-gray-800">{it.bookName}</td>
                           <td className="px-3 py-2 text-gray-500">{it.sku || '—'}</td>
                           <td className="px-3 py-2 text-gray-800">{it.quantity}</td>

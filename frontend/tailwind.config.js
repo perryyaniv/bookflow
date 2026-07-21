@@ -21,7 +21,7 @@ export default {
           created: '#9CA3AF',
           ordered: '#3B82F6',
           partial: '#F59E0B',
-          arrived: '#16A34A',
+          arrived: '#1F6F5C',
           notified: '#8B5CF6',
           collected: '#0EA5E9',
           cancelled: '#EF4444',

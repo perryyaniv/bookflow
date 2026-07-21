@@ -163,7 +163,7 @@ export default function OrderCard({ order, level, canWrite, onStatusChanged }: P
       </div>
 
       <div className="flex items-center justify-between gap-2">
-        <span className={`text-xs font-bold ${order.isPaid ? 'text-green-600' : 'text-red-500 animate-breathe'}`}>
+        <span className={`text-xs font-bold ${order.isPaid ? 'text-primary' : 'text-red-500 animate-breathe'}`}>
           {order.isPaid ? t('orders.paid') : t('orders.unpaid')}
         </span>
       </div>
@@ -181,13 +181,13 @@ export default function OrderCard({ order, level, canWrite, onStatusChanged }: P
                   <button
                     onClick={(e) => handleToggleArrived(e, idx, it.arrived)}
                     disabled={updatingIndex === idx}
-                    className={`font-semibold hover:underline disabled:opacity-50 disabled:hover:no-underline transition-colors ${it.arrived ? 'text-green-600' : 'text-amber-600'}`}
+                    className={`font-semibold hover:underline disabled:opacity-50 disabled:hover:no-underline transition-colors ${it.arrived ? 'text-primary' : 'text-amber-600'}`}
                   >
                     {it.arrived ? `${t('orders.arrived')} ✓` : t('orders.pending')}
                   </button>
                 ) : (
                   it.arrived
-                    ? <span className="text-green-600 font-semibold">{t('orders.arrived')} ✓</span>
+                    ? <span className="text-primary font-semibold">{t('orders.arrived')} ✓</span>
                     : <span className="text-amber-600 font-semibold">{t('orders.pending')}</span>
                 )}
               </span>
