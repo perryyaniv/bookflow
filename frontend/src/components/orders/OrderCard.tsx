@@ -185,11 +185,11 @@ export default function OrderCard({ order, level, canWrite, onStatusChanged }: P
             <span className="label mb-0">{t('orders.branch')}</span>
             <span className="text-xs text-gray-700 font-medium">{order.branchId?.name ?? '—'}</span>
 
-            <span className="label mb-0">{t('orders.orderDate')}</span>
-            <span className="text-xs text-gray-700">{formatDate(order.orderDate)}</span>
-
             <span className="label mb-0">{t('orders.orderedFrom')}</span>
             <span className="text-xs text-gray-700">{order.orderedFrom || '—'}</span>
+
+            <span className="label mb-0">{t('orders.orderDate')}</span>
+            <span className="text-xs text-gray-700">{formatDate(order.orderDate)}</span>
 
             <span className="label mb-0">{t('orders.orderedAt')}</span>
             <span className="text-xs text-gray-700">{formatDate(order.orderedAt)}</span>
