@@ -195,8 +195,11 @@ router.put('/:id', requireWriteAccess, asyncHandler<AuthRequest>(async (req, res
   }
 
   if (newStatus && newStatus !== existing.status) {
-    if (newStatus === 'הוזמן' && !existing.orderedAt) update.orderedAt = new Date();
-    if (newStatus === 'הלקוח עודכן' && !existing.customerNotifiedAt) update.customerNotifiedAt = new Date();
+    // Only auto-stamp today's date if the client didn't explicitly supply
+    // one — lets editors/admins backdate these to when the status change
+    // actually happened, instead of when it was entered into the system.
+    if (newStatus === 'הוזמן' && !existing.orderedAt && !update.orderedAt) update.orderedAt = new Date();
+    if (newStatus === 'הלקוח עודכן' && !existing.customerNotifiedAt && !update.customerNotifiedAt) update.customerNotifiedAt = new Date();
     update.statusChangedAt = new Date();
     Object.assign(update, dateFieldsToClearOnBackwardMove(existing.status, newStatus));
   }

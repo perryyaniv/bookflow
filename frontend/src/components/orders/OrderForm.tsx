@@ -16,6 +16,8 @@ type FormData = {
   orderedFrom: string;
   isPaid: boolean;
   status: OrderStatus;
+  orderedAt: string;
+  customerNotifiedAt: string;
   notes: string;
   items: OrderItem[];
 };
@@ -37,6 +39,8 @@ function toForm(order?: Partial<Order>): FormData {
     orderedFrom: order?.orderedFrom ?? '',
     isPaid: order?.isPaid ?? false,
     status: order?.status ?? 'נוצר',
+    orderedAt: order?.orderedAt ? order.orderedAt.slice(0, 10) : '',
+    customerNotifiedAt: order?.customerNotifiedAt ? order.customerNotifiedAt.slice(0, 10) : '',
     notes: order?.notes ?? '',
     items: order?.items?.length ? order.items : [{ bookName: '', sku: '', quantity: 1, arrived: false }],
   };
@@ -85,6 +89,8 @@ export default function OrderForm({ initial, onSubmit, onCancel, loading, isEdit
     }
     const payload: Record<string, unknown> = {
       ...form,
+      orderedAt: form.orderedAt || null,
+      customerNotifiedAt: form.customerNotifiedAt || null,
       items: form.items
         .filter((it) => it.bookName.trim())
         .map((it) => ({ ...it, quantity: Number(it.quantity) || 1 })),
@@ -142,6 +148,12 @@ export default function OrderForm({ initial, onSubmit, onCancel, loading, isEdit
             </select>
           </div>
         )}
+        {isEdit && field(t('orders.orderedAt'), (
+          <DateInput value={form.orderedAt} onChange={(v) => set('orderedAt', v)} className={inputCls + ' pl-9'} />
+        ))}
+        {isEdit && field(t('orders.customerNotifiedAt'), (
+          <DateInput value={form.customerNotifiedAt} onChange={(v) => set('customerNotifiedAt', v)} className={inputCls + ' pl-9'} />
+        ))}
       </div>
 
       <div className="flex items-center gap-3">
