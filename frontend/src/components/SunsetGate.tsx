@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { SUNSET_AT, SPLASH_DURATION_MS, DEVELOPER_CONTACT } from '../config/sunset';
+import { SUNSET_AT, DEVELOPER_CONTACT } from '../config/sunset';
 
 function splitRemaining(ms: number) {
   const total = Math.max(0, Math.floor(ms / 1000));
@@ -44,23 +44,19 @@ function ContactCard() {
 
 export default function SunsetGate({ children }: { children: React.ReactNode }) {
   const [now, setNow] = useState(() => Date.now());
-  const [startedAt] = useState(() => Date.now());
+  const [acknowledged, setAcknowledged] = useState(false);
 
   const remainingMs = SUNSET_AT.getTime() - now;
   const ended = remainingMs <= 0;
-  const splashElapsed = now - startedAt;
-  const splashDone = splashElapsed >= SPLASH_DURATION_MS;
 
   useEffect(() => {
-    const id = setInterval(() => setNow(Date.now()), 250);
+    const id = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(id);
   }, []);
 
-  if (!ended && splashDone) return <>{children}</>;
+  if (!ended && acknowledged) return <>{children}</>;
 
   const r = splitRemaining(remainingMs);
-  const splashSecondsLeft = Math.ceil((SPLASH_DURATION_MS - splashElapsed) / 1000);
-  const progress = Math.min(100, (splashElapsed / SPLASH_DURATION_MS) * 100);
 
   return (
     <div className="min-h-dvh bg-bg flex items-center justify-center p-4">
@@ -99,17 +95,14 @@ export default function SunsetGate({ children }: { children: React.ReactNode }) 
         <ContactCard />
 
         {!ended && (
-          <div className="space-y-1">
-            <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-primary transition-[width] duration-200 ease-linear"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-            <p className="text-center text-xs text-gray-500">
-              האפליקציה תיפתח בעוד {splashSecondsLeft} שניות...
-            </p>
-          </div>
+          <button
+            type="button"
+            onClick={() => setAcknowledged(true)}
+            className="w-full bg-primary hover:bg-primary-dark text-white font-bold py-3 rounded-lg transition-colors"
+            autoFocus
+          >
+            הבנתי
+          </button>
         )}
       </div>
     </div>
