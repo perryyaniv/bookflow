@@ -26,7 +26,7 @@ function ContactCard() {
   const c = DEVELOPER_CONTACT;
   return (
     <div className="bg-bg border border-gray-200 rounded-lg p-4 text-center space-y-1">
-      <p className="text-sm text-gray-600">לשאלות ניתן ליצור קשר עם המפתח:</p>
+      <p className="text-sm text-gray-600">להארכת הרישיון ולפרטים נוספים ניתן ליצור קשר עם המפתח:</p>
       <p className="font-bold text-dark">{c.name}</p>
       <p>
         <a href={`mailto:${c.email}`} className="text-primary font-semibold underline" dir="ltr">
@@ -65,16 +65,19 @@ export default function SunsetGate({ children }: { children: React.ReactNode }) 
           <h1 className="text-2xl font-extrabold text-primary">BookFlow</h1>
           {ended ? (
             <>
-              <h2 className="text-xl font-bold text-dark">התמיכה באפליקציה הסתיימה</h2>
-              <p className="text-gray-600">הגישה לאפליקציה נסגרה. תודה לכל המשתמשים!</p>
+              <h2 className="text-xl font-bold text-dark">תוקף רישיון השימוש באפליקציה פג</h2>
+              <p className="text-gray-600">
+                הגישה לאפליקציה נסגרה. ניתן לחדש את רישיון השימוש בהתאם להסכם מול המפתח.
+              </p>
             </>
           ) : (
             <>
               <h2 className="text-xl font-bold text-dark">הודעה חשובה</h2>
               <p className="text-gray-600">
-                התמיכה באפליקציה תופסק בתאריך{' '}
+                רישיון השימוש באפליקציה יפוג בתאריך{' '}
                 <strong>{SUNSET_AT.toLocaleDateString('he-IL', { timeZone: 'Asia/Jerusalem' })}</strong>
-                , ולאחר מכן הגישה לאפליקציה תיסגר לכל המשתמשים.
+                , ולאחר מכן הגישה לאפליקציה תיסגר לכל המשתמשים. ניתן להאריך את השימוש
+                בהתאם להסכם מול המפתח.
               </p>
             </>
           )}

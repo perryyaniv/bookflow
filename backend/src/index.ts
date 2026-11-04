@@ -26,12 +26,12 @@ app.set('io', io);
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 
-// End of support: after this moment all API access is closed.
+// License expiry: after this moment all API access is closed.
 // Keep in sync with SUNSET_AT in frontend/src/config/sunset.ts.
 const SUNSET_AT = new Date('2026-11-11T23:59:59+02:00');
 app.use('/api', (_req, res, next) => {
   if (Date.now() >= SUNSET_AT.getTime()) {
-    res.status(410).json({ message: 'התמיכה באפליקציה הסתיימה והגישה נסגרה' });
+    res.status(410).json({ message: 'תוקף רישיון השימוש באפליקציה פג והגישה נסגרה' });
     return;
   }
   next();
